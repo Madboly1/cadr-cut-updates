@@ -1,0 +1,15 @@
+{
+  "version": "1.3.2",
+  "repo": "Madboly1/cadr-cut-updates",
+  "releaseDate": "2026-11-02",
+  "notesAr": "إضافة التحديث السحابي التلقائي المباشر من GitHub (Madboly1/cadr-cut-updates) ودعم Premiere 2020-2027+",
+  "notesEn": "Added 1-Click GitHub Cloud OTA Auto-Updater (Madboly1/cadr-cut-updates) and Premiere 2020-2027+ stability fixes",
+  "files": [
+    "Plugin/client/index.html",
+    "Plugin/client/main.js",
+    "Plugin/client/license.js",
+    "Plugin/jsx/host.jsx",
+    "Plugin/CSXS/manifest.xml",
+    "Plugin/version.json"
+  ]
+}
