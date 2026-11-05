@@ -1,9 +1,9 @@
 {
-  "version": "1.3.3",
+  "version": "1.3.5",
   "repo": "Madboly1/cadr-cut-updates",
   "releaseDate": "2026-11-03",
-  "notesAr": "تفعيل موحّد لكل إصدارات بريمير على نفس الجهاز + تحديث موديلات Gemini 3.8 Flash + إخفاء رابط التحديث من الواجهة",
-  "notesEn": "Unified license activation across all Premiere Pro versions on same PC + Gemini 3.8 Flash models + cleaner updater UI",
+  "notesAr": "تفعيل موحّد يعمل على جميع نسخ بريمير مع كسر الكاش تلقائيًا + إشعار تحديث اختياري بزر (تحديث الآن / لاحقًا)",
+  "notesEn": "Unified license across all Premiere versions with automatic cache-busting + optional update notification banner",
   "files": [
     "Plugin/client/index.html",
     "Plugin/client/main.js",
