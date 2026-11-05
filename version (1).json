@@ -1,0 +1,15 @@
+{
+  "version": "1.3.5",
+  "repo": "Madboly1/cadr-cut-updates",
+  "releaseDate": "2026-11-03",
+  "notesAr": "تفعيل موحّد يعمل على جميع نسخ بريمير مع كسر الكاش تلقائيًا + إشعار تحديث اختياري بزر (تحديث الآن / لاحقًا)",
+  "notesEn": "Unified license across all Premiere versions with automatic cache-busting + optional update notification banner",
+  "files": [
+    "Plugin/client/index.html",
+    "Plugin/client/main.js",
+    "Plugin/client/license.js",
+    "Plugin/jsx/host.jsx",
+    "Plugin/CSXS/manifest.xml",
+    "Plugin/version.json"
+  ]
+}
