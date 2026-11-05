@@ -1,0 +1,2864 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-ui-lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CADR CUT — CADR STUDIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@600;700;800&family=Almarai:wght@700;800&family=Bebas+Neue&family=Cairo:wght@600;700;800;900&family=Changa:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@600;700&family=Inter:wght@500;600;700;800&family=Montserrat:wght@700;800;900&family=Poppins:wght@600;700;800&family=Readex+Pro:wght@600;700&family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+
+<style>
+:root{
+  /* CADR STUDIO Approved Brand Identity Palette */
+  --bg:#101114;             /* Charcoal — Primary background */
+  --panel:#0B0C0F;          /* Deep Charcoal — Pinned bar & input wells */
+  --surface:#17191E;        /* Elevated card surface */
+  --surface-hover:#1E2128;  /* Interactive card hover */
+  --line:#252830;           /* Crisp subtle border */
+  --line-hover:#3A3E4B;     /* Hover border */
+  --text:#F5F5F5;           /* Off-White — Main text / light surfaces */
+  --muted:#858585;          /* Mid Gray — Secondary text */
+  --warn:#F59E0B;           /* Warning indicator */
+  --ok:#22C55E;             /* Connected / Ready indicator */
+  --danger:#EF4444;         /* Destructive action hover */
+  --accent:#FF6B35;         /* Cinema Orange — Accent / calls to action */
+  --accent-hover:#FF8252;   /* Cinema Orange hover */
+  --accent-ink:#F5F5F5;     /* White text on Cinema Orange primary actions */
+  --accent-soft:rgba(255,107,53,.14);
+  --accent-border:rgba(255,107,53,.45);
+  --font-head:"Montserrat","Inter","Noto Sans Arabic","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-ui:"Inter","Noto Sans Arabic","Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#282B34;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#3A3E4B}
+
+html,body{
+  margin:0;padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font:13px/1.48 var(--font-ui);
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer;transition:all .15s ease}
+button:disabled{cursor:default}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.muted{color:var(--muted)}
+
+/* ======================= BRAND HEADER ======================= */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:11px 12px 9px;
+  background:linear-gradient(180deg,#14161B 0%,var(--bg) 100%);
+  border-bottom:1px solid #1B1D24;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+.brand-mark{
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  background:#15171C;
+  border:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 32px;
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+.brand-mark svg{width:24px;height:24px;display:block}
+.brand-text{display:flex;flex-direction:column;line-height:1.15}
+.logo{
+  font-family:var(--font-head);
+  font-weight:800;
+  letter-spacing:.09em;
+  font-size:14px;
+  color:var(--text);
+  text-transform:uppercase;
+}
+.logo span{color:var(--accent)}
+.by{
+  color:var(--muted);
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:.02em;
+  margin-top:2px;
+}
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.lang-toggle{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:4px 7px;
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:10.5px;
+  letter-spacing:.04em;
+  color:var(--muted);
+  line-height:1;
+}
+.lang-toggle:hover{
+  border-color:var(--accent);
+  color:var(--text);
+}
+.lang-toggle b{
+  color:var(--accent);
+}
+.gear-btn{
+  width:26px;
+  height:26px;
+  border-radius:6px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--muted);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+.gear-btn .ic{
+  width:15px;
+  height:15px;
+  transition:transform .2s ease,color .15s ease;
+}
+.gear-btn:hover{
+  border-color:var(--line-hover);
+  color:var(--text);
+  background:var(--surface-hover);
+}
+.gear-btn:hover .ic{
+  transform:rotate(30deg);
+}
+.gear-btn.active{
+  background:var(--accent-soft);
+  border-color:var(--accent);
+  color:var(--accent);
+  box-shadow:inset 0 0 0 1px rgba(255,107,53,.15);
+}
+.settings-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:7px 10px;
+}
+.settings-head-title{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:12px;
+  color:var(--text);
+}
+.settings-head-title .ic{
+  width:15px;
+  height:15px;
+  color:var(--accent);
+}
+.pr-badge{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:11px;
+  letter-spacing:.02em;
+  color:#9999FF;
+  background:#14122B;
+  border:1px solid #2D2960;
+  border-radius:6px;
+  padding:4px 7px;
+  line-height:1;
+  user-select:none;
+}
+
+/* ======================= NAVIGATION TABS ======================= */
+.tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+  padding:7px 12px;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+.tab{
+  background:var(--surface);
+  border:1px solid transparent;
+  border-radius:8px;
+  color:var(--muted);
+  padding:7px 4px 6px;
+  font-size:11.5px;
+  font-weight:500;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  line-height:1.15;
+}
+.tab .ic{
+  width:16px;
+  height:16px;
+  color:var(--muted);
+  transition:color .15s ease,transform .15s ease;
+}
+.tab:hover:not(.active){
+  color:var(--text);
+  background:var(--surface-hover);
+  border-color:var(--line);
+}
+.tab:hover:not(.active) .ic{
+  color:var(--text);
+}
+.tab.active{
+  color:var(--text);
+  font-family:var(--font-head);
+  font-weight:700;
+  background:var(--accent-soft);
+  border-color:var(--accent);
+  box-shadow:inset 0 0 0 1px rgba(255,107,53,.12);
+}
+.tab.active .ic{
+  color:var(--accent);
+}
+
+/* ======================= LAYOUT & SELECTION BAR ======================= */
+.main{padding:10px 12px 110px}
+.tabpanel{display:none;flex-direction:column;gap:9px}
+.tabpanel.active{display:flex}
+
+.sel{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:12px;
+  min-height:32px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:5px 10px;
+}
+.sel-text{
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  unicode-bidi:plaintext;
+}
+.sel-refresh{
+  background:none;
+  border:1px solid transparent;
+  border-radius:5px;
+  color:var(--muted);
+  padding:3px 6px;
+  font-size:12px;
+  line-height:1;
+  flex:0 0 auto;
+}
+.sel-refresh:hover{
+  color:var(--text);
+  background:var(--surface-hover);
+  border-color:var(--line);
+}
+.status-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--muted);
+  flex:0 0 auto;
+}
+.status-dot.ok{
+  background:var(--accent);
+  box-shadow:0 0 8px var(--accent);
+}
+.status-dot.warn{
+  background:var(--muted);
+}
+
+.lb{font-size:12px;color:var(--muted);font-weight:500}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ======================= PRESET / STYLE CARDS ======================= */
+.cards{display:flex;gap:6px}
+.pre{
+  flex:1;
+  min-width:0;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--muted);
+  border-radius:8px;
+  padding:7px 4px 6px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  font-size:11.5px;
+  font-weight:500;
+}
+.pre:hover{
+  border-color:var(--line-hover);
+  color:var(--text);
+  background:var(--surface-hover);
+}
+.pre.on{
+  border-color:var(--accent);
+  color:var(--text);
+  background:var(--accent-soft);
+  font-weight:600;
+}
+.pre.on .ic{color:var(--accent)}
+.pre.slim{flex:0 0 38px;justify-content:center}
+
+/* ======================= CHIPS ======================= */
+.chip{
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--muted);
+  border-radius:6px;
+  padding:3px 9px;
+  font-size:11.5px;
+  font-weight:500;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  line-height:1.45;
+}
+.chip:hover{
+  border-color:var(--line-hover);
+  color:var(--text);
+}
+.chip.on,label.chip input:checked + span{
+  color:var(--text);
+  font-weight:600;
+}
+.chip.on{
+  border-color:var(--accent);
+  background:var(--accent-soft);
+}
+label.chip{cursor:pointer;padding:0;border:none;background:none}
+label.chip input{position:absolute;opacity:0;pointer-events:none}
+label.chip span{
+  display:block;
+  padding:3px 9px;
+  border-radius:6px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  transition:all .15s ease;
+}
+label.chip:hover span{
+  border-color:var(--line-hover);
+  color:var(--text);
+}
+label.chip input:checked + span{
+  border-color:var(--accent);
+  background:var(--accent-soft);
+  color:var(--accent);
+}
+.chip.fixed{opacity:.75;cursor:default}
+.chip .nm{background:none;border:none;color:inherit;padding:0;font-size:11.5px}
+.chip.on .nm{color:var(--accent);font-weight:600}
+.chip .x{background:none;border:none;color:var(--muted);padding:0;display:flex}
+.chip .x:hover{color:var(--danger)}
+.chip .x .ic{width:12px;height:12px}
+
+/* ======================= CARDS / DETAILS ======================= */
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+.card > summary,.card > .card-head{
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  cursor:pointer;
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:.01em;
+  color:var(--text);
+}
+.card > summary::-webkit-details-marker{display:none}
+.card > summary::after{
+  content:"";
+  width:6px;
+  height:6px;
+  border-right:1.8px solid var(--muted);
+  border-bottom:1.8px solid var(--muted);
+  transform:rotate(45deg);
+  transition:transform .15s ease,border-color .15s ease;
+  margin-inline-start:8px;
+}
+.card > summary:hover::after{border-color:var(--accent)}
+.card[open] > summary::after{transform:rotate(225deg);border-color:var(--accent)}
+.card .body{
+  padding:2px 12px 11px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  border-top:1px solid rgba(255,255,255,.03);
+}
+.card.pad,.card .pad{padding:11px 12px}
+.card-title{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:.01em;
+  color:var(--text);
+}
+.card-note{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;unicode-bidi:plaintext}
+
+/* ======================= SLIDERS & EDITABLE BADGES ======================= */
+.slider-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px;
+}
+.slider-row b{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:11px;
+  color:var(--text);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:5px;
+  padding:1px 7px;
+  cursor:pointer;
+  transition:border-color .15s ease,color .15s ease;
+  direction:ltr;
+  unicode-bidi:isolate;
+}
+.slider-row b:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.slider-edit-input{
+  width:64px !important;
+  padding:1px 5px !important;
+  font-family:var(--font-head) !important;
+  font-weight:700 !important;
+  font-size:11px !important;
+  text-align:center;
+  border-color:var(--accent) !important;
+  border-radius:5px !important;
+  height:22px;
+}
+input[type=range]{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  height:5px;
+  border-radius:3px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  outline:none;
+  margin:4px 0;
+  padding:0;
+  direction:ltr;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--accent);
+  border:2px solid var(--text);
+  box-shadow:0 1px 4px rgba(0,0,0,.5);
+  cursor:pointer;
+  transition:transform .12s ease,background .12s ease;
+}
+input[type=range]::-webkit-slider-thumb:hover{
+  transform:scale(1.1);
+  background:var(--accent-hover);
+}
+input[type=range]:focus-visible::-webkit-slider-thumb{
+  box-shadow:0 0 0 3px var(--accent-soft);
+}
+.sep{border-top:1px solid var(--line);margin:6px 0 4px}
+.dim{opacity:.4;transition:opacity .15s ease}
+
+/* ======================= INPUTS ======================= */
+.field{display:flex;flex-direction:column;gap:4px}
+.field > label{font-size:11.5px;color:var(--muted);font-weight:500}
+input[type=text],input[type=password],input[type=number],select,textarea{
+  width:100%;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  color:var(--text);
+  padding:7px 10px;
+  font:inherit;
+  transition:border-color .15s ease;
+}
+input[type=text]:hover,input[type=password]:hover,input[type=number]:hover,select:hover,textarea:hover{
+  border-color:var(--line-hover);
+}
+input[type=color]{
+  width:42px;
+  flex:0 0 42px !important;
+  height:34px;
+  padding:2px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--panel);
+  cursor:pointer;
+}
+textarea{
+  resize:vertical;
+  min-height:96px;
+  font-family:Consolas,Menlo,"JetBrains Mono",monospace;
+  font-size:11.5px;
+  line-height:1.5;
+}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px var(--accent-soft);
+}
+.inline{display:flex;gap:6px}
+.inline input,.inline select{flex:1;min-width:0}
+
+/* ======================= BUTTONS ======================= */
+.btn{
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:9px 10px;
+  text-align:center;
+  font-weight:600;
+  font-size:12.5px;
+}
+.btn:hover:not(:disabled){
+  border-color:var(--line-hover);
+  background:var(--surface-hover);
+}
+.btn:disabled{opacity:.38}
+.btn.primary{
+  background:var(--accent);
+  color:var(--accent-ink);
+  border-color:var(--accent);
+  font-family:var(--font-head);
+  font-weight:700;
+  letter-spacing:.02em;
+  font-size:13px;
+  padding:11px 14px;
+  box-shadow:0 4px 14px rgba(255,107,53,.24),inset 0 1px 0 rgba(255,255,255,.16);
+}
+.btn.primary:hover:not(:disabled){
+  background:var(--accent-hover);
+  border-color:var(--accent-hover);
+  box-shadow:0 6px 18px rgba(255,107,53,.34),inset 0 1px 0 rgba(255,255,255,.22);
+}
+.btn.accent-outline{
+  border-color:var(--accent-border);
+  color:var(--accent);
+  background:var(--accent-soft);
+}
+.btn.accent-outline:hover:not(:disabled){
+  border-color:var(--accent);
+  background:rgba(255,107,53,.22);
+}
+.btn.sm{padding:5px 10px;font-size:11.5px;border-radius:6px}
+.btn-col{display:flex;flex-direction:column;gap:7px;margin-top:1px}
+.btn-row{display:flex;gap:7px}
+.btn-row .btn{flex:1}
+
+/* ======================= VISUAL CAPTION LINE EDITOR ======================= */
+.cap-lines-box{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  max-height:190px;
+  overflow-y:auto;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:7px;
+}
+.cap-line-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.cap-time-btn{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:5px;
+  color:var(--muted);
+  font-family:Consolas,Menlo,monospace;
+  font-size:10.5px;
+  padding:4px 6px;
+  white-space:nowrap;
+  direction:ltr;
+  flex:0 0 auto;
+}
+.cap-time-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.cap-line-input{
+  flex:1;
+  min-width:0;
+  padding:5px 8px !important;
+  font-size:12px !important;
+  border-radius:6px !important;
+  background:var(--surface) !important;
+}
+.cap-empty{
+  text-align:center;
+  color:var(--muted);
+  font-size:11.5px;
+  padding:18px 8px;
+}
+
+/* ======================= STICKY MOGRT MONITOR & DROPDOWN ======================= */
+.mogrt-sticky-top{
+  position:sticky;
+  top:51px;
+  z-index:4;
+  background:var(--bg);
+  padding:2px 0 8px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:2px;
+}
+.mogrt-monitor{
+  position:relative;
+  width:100%;
+  height:146px;
+  border-radius:10px;
+  background:radial-gradient(ellipse at 50% 35%, #232733 0%, #12141A 65%, #0B0C0F 100%);
+  border:1px solid var(--line-hover);
+  box-shadow:inset 0 0 24px rgba(0,0,0,.65), 0 4px 14px rgba(0,0,0,.35);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+}
+/* Safe-area corner brackets inside monitor */
+.mogrt-safe{
+  position:absolute;
+  inset:12px 16px;
+  border:1px dashed rgba(255,255,255,.07);
+  border-radius:4px;
+  pointer-events:none;
+}
+.mogrt-mon-bar{
+  position:absolute;
+  top:7px;
+  left:9px;
+  right:9px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  z-index:2;
+  pointer-events:none;
+}
+.mogrt-live-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:rgba(11,12,15,.78);
+  border:1px solid rgba(255,107,53,.4);
+  border-radius:5px;
+  padding:2px 7px;
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:9.5px;
+  letter-spacing:.08em;
+  color:var(--text);
+}
+.mogrt-live-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 6px var(--accent);
+  animation:cadrpulse 1.4s infinite;
+}
+.mogrt-motion-tag{
+  pointer-events:auto;
+  background:rgba(11,12,15,.78);
+  border:1px solid var(--line);
+  border-radius:5px;
+  padding:2px 7px;
+  font-size:10px;
+  color:var(--muted);
+  cursor:pointer;
+}
+.mogrt-motion-tag:hover{
+  border-color:var(--accent);
+  color:var(--text);
+}
+.mogrt-stage{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  overflow:hidden;
+}
+.mogrt-caption-box{
+  position:absolute;
+  left:50%;
+  top:72%;
+  transform:translate(-50%,-50%);
+  padding:5px 12px;
+  border-radius:7px;
+  text-align:center;
+  white-space:nowrap;
+  transition:top .08s ease,left .08s ease,transform .08s ease,background .12s ease;
+  font-family:var(--font-head);
+  font-weight:800;
+  font-size:18px;
+  line-height:1.3;
+  color:#F5F5F5;
+  text-shadow:0 2px 8px rgba(0,0,0,.85);
+  display:flex;
+  align-items:center;
+  gap:5px;
+  direction:rtl;
+}
+.mogrt-word{
+  display:inline-block;
+  padding:1px 5px;
+  border-radius:5px;
+  transition:all .16s cubic-bezier(.2,.9,.3,1.2);
+}
+.mogrt-word.active-pop{
+  transform:scale(1.16) translateY(-2px);
+}
+.mogrt-word.active-box{
+  transform:scale(1.08);
+  box-shadow:0 2px 8px rgba(0,0,0,.45);
+}
+.mogrt-word.active-slide{
+  transform:translateY(-3px);
+}
+.mogrt-mon-foot{
+  position:absolute;
+  bottom:6px;
+  left:9px;
+  right:9px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:10px;
+  color:var(--muted);
+  z-index:2;
+  pointer-events:none;
+}
+.mogrt-mon-foot span{
+  background:rgba(11,12,15,.72);
+  padding:1px 6px;
+  border-radius:4px;
+}
+.mogrt-select-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:8px;
+}
+.mogrt-select-row select{
+  flex:1;
+  min-width:0;
+  font-weight:600;
+}
+
+/* ======================= FONT PREVIEW BOX (STYLE TAB) ======================= */
+.font-preview-box{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px 10px;
+  text-align:center;
+  color:var(--text);
+  font-size:15px;
+  line-height:1.4;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ======================= STATUS / LOG ======================= */
+.log{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:5px 10px;
+}
+.log > summary{
+  list-style:none;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+  padding:2px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.log > summary::-webkit-details-marker{display:none}
+.log > summary::after{
+  content:"▾";
+  font-size:11px;
+  color:var(--muted);
+}
+.log[open] > summary::after{content:"▴";color:var(--accent)}
+.status{
+  white-space:pre-wrap;
+  unicode-bidi:plaintext;
+  font-size:11.5px;
+  color:var(--muted);
+  padding:7px 2px 3px;
+  max-height:200px;
+  overflow:auto;
+  word-break:break-word;
+  line-height:1.5;
+}
+.help{font-size:11px;color:var(--muted);line-height:1.55;unicode-bidi:plaintext}
+.field-hint{font-size:11px;color:var(--muted);line-height:1.5;unicode-bidi:plaintext}
+
+/* ======================= FILLER REVIEW ======================= */
+#fillerWordsBox{display:none}
+.filler-list{max-height:190px;overflow:auto;margin-top:6px}
+.filler-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:5px 0;
+  border-bottom:1px solid var(--line);
+  font-size:12.5px;
+}
+.filler-row:last-child{border-bottom:none}
+.filler-row input{flex:0 0 auto;accent-color:var(--accent)}
+.filler-row > span{display:flex;align-items:baseline;gap:8px;flex:1;min-width:0}
+.filler-word{unicode-bidi:isolate;min-width:0;color:var(--text);font-weight:500}
+.filler-time{color:var(--muted);font-size:11px;white-space:nowrap;direction:ltr;unicode-bidi:isolate}
+.filler-row button{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:6px;
+  color:var(--muted);
+  padding:2px 8px;
+  font-size:11.5px;
+}
+.filler-row button:hover{border-color:var(--danger);color:var(--danger)}
+.filler-row button.filler-play:hover{border-color:var(--accent);color:var(--accent)}
+.check{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.check input{accent-color:var(--accent)}
+
+/* ======================= PINNED PROGRESS BAR ======================= */
+.bar{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:var(--panel);
+  border-top:1px solid var(--line);
+  padding:8px 12px 10px;
+  z-index:10;
+  box-shadow:0 -4px 16px rgba(0,0,0,.45);
+}
+.wave{display:flex;align-items:center;gap:2px;height:38px}
+.wave i{flex:1;border-radius:2px;background:var(--line);transition:background .12s}
+.wave i.f{background:var(--accent)}
+.textlines{display:none;flex-direction:column;gap:6px;height:38px;justify-content:center}
+.textlines i{display:block;height:5px;border-radius:3px;background:var(--accent);animation:cadrpulse 1.2s infinite}
+.textlines i:nth-child(1){width:92%}
+.textlines i:nth-child(2){width:70%;animation-delay:.25s}
+.textlines .last{display:flex;align-items:center;gap:3px;animation:cadrpulse 1.2s .5s infinite}
+.textlines .last i{width:42%;animation:none}
+.textlines .last u{display:block;width:2px;height:11px;background:var(--accent);animation:cadrblink 1s infinite}
+.typed{display:none;height:38px;align-items:center;justify-content:center;text-align:center;font-size:13.5px;overflow:hidden}
+.typed .cur{display:inline-block;width:2px;height:15px;background:var(--accent);margin-inline-start:2px;vertical-align:-3px;animation:cadrblink 1s infinite}
+.barfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:5px;font-size:11.5px;color:var(--muted)}
+.barfoot span:first-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;flex:1}
+.bar-right{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+#cadrBarPct{color:var(--accent);font-family:var(--font-head);font-weight:700;white-space:nowrap}
+.stop-btn{
+  display:none;
+  background:rgba(239,68,68,.15);
+  border:1px solid var(--danger);
+  color:#FCA5A5;
+  border-radius:5px;
+  padding:2px 7px;
+  font-size:10.5px;
+  font-weight:600;
+  line-height:1.2;
+}
+.stop-btn:hover{
+  background:var(--danger);
+  color:#fff;
+}
+@keyframes cadrpulse{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes cadrblink{0%,50%{opacity:1}51%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.textlines i,.textlines .last,.cur,.textlines u{animation:none}}
+
+/* ======================= BRAND FOOTER ======================= */
+.footer{
+  text-align:center;
+  padding:8px 0 2px;
+  border-top:1px solid var(--line);
+  margin-top:4px;
+}
+.footer-brand{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:11px;
+  letter-spacing:.12em;
+  color:var(--text);
+}
+.footer-tag{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:9.5px;
+  letter-spacing:.16em;
+  color:var(--accent);
+  margin-top:2px;
+}
+
+
+/* ======================= PRO CAPTION SETTINGS STUDIO ======================= */
+.cap-studio-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-top:4px;
+}
+.cap-stat-box{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:7px 9px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.cap-stat-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--muted);
+}
+.cap-stat-head b{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:11px;
+  color:var(--text);
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:0 5px;
+  cursor:pointer;
+  direction:ltr;
+}
+.seg-row{
+  display:flex;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:2px;
+  gap:2px;
+}
+.seg-btn{
+  flex:1;
+  background:transparent;
+  border:none;
+  border-radius:5px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+  padding:4px 6px;
+  text-align:center;
+}
+.seg-btn:hover:not(.on){
+  color:var(--text);
+}
+.seg-btn.on{
+  background:var(--accent);
+  color:var(--accent-ink);
+  box-shadow:0 1px 4px rgba(0,0,0,.35);
+}
+.cap-toggles-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
+  margin-top:4px;
+}
+.cap-toggle-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:6px 8px;
+  cursor:pointer;
+  font-size:11px;
+  color:var(--muted);
+  transition:all .15s ease;
+  user-select:none;
+}
+.cap-toggle-card:hover{
+  border-color:var(--line-hover);
+  color:var(--text);
+}
+.cap-toggle-card input{
+  accent-color:var(--accent);
+  margin:0;
+  width:14px;
+  height:14px;
+  cursor:pointer;
+}
+.cap-toggle-card.on{
+  border-color:#383D4B;
+  background:var(--surface);
+  color:var(--text);
+  font-weight:600;
+}
+
+/* ======================= INTERACTIVE MOGRT STAGE UPGRADES ======================= */
+.mogrt-monitor{
+  cursor:grab;
+}
+.mogrt-monitor.dragging{
+  cursor:grabbing;
+  border-color:var(--accent);
+}
+.mogrt-guide-x,.mogrt-guide-y{
+  position:absolute;
+  background:rgba(255,107,53,.45);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .12s ease;
+  z-index:1;
+}
+.mogrt-guide-x{top:0;bottom:0;left:50%;width:1px}
+.mogrt-guide-y{left:0;right:0;top:50%;height:1px}
+.mogrt-monitor.dragging .mogrt-guide-x,
+.mogrt-monitor.dragging .mogrt-guide-y{
+  opacity:1;
+}
+.mogrt-frame-916{
+  position:absolute;
+  top:6px;
+  bottom:6px;
+  left:50%;
+  width:72px;
+  transform:translateX(-50%);
+  border:1px dashed rgba(255,107,53,.32);
+  border-radius:5px;
+  pointer-events:none;
+  transition:opacity .15s ease;
+}
+.mogrt-caption-box{
+  pointer-events:auto;
+  cursor:grab;
+  user-select:none;
+}
+.mogrt-caption-box:hover{
+  outline:1px dashed rgba(255,107,53,.65);
+  outline-offset:2px;
+}
+.mogrt-mon-controls{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  pointer-events:auto;
+}
+.color-swatch-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+}
+.color-swatch-item{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:6px 4px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  font-size:10.5px;
+  color:var(--muted);
+  text-align:center;
+}
+.color-swatch-item input[type=color]{
+  width:34px !important;
+  flex:0 0 28px !important;
+  height:28px !important;
+  border-radius:6px;
+  padding:1px;
+}
+.pos-presets{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px;
+}
+
+
+@keyframes cadrAnimSlideUp{
+  0%{opacity:0;transform:translateY(10px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes cadrAnimZoom{
+  0%{opacity:.25;transform:scale(.76)}
+  100%{opacity:1;transform:scale(1.12)}
+}
+@keyframes cadrAnimTracking{
+  0%{opacity:.3;letter-spacing:.28em}
+  100%{opacity:1;letter-spacing:.03em}
+}
+@keyframes cadrAnimBlur{
+  0%{opacity:.2;filter:blur(5px);transform:scale(.94)}
+  100%{opacity:1;filter:blur(0);transform:scale(1.06)}
+}
+@keyframes cadrAnimFade{
+  0%{opacity:.15}
+  100%{opacity:1}
+}
+.mogrt-word.anim-1{animation:cadrAnimSlideUp .32s cubic-bezier(.2,.9,.3,1) forwards}
+.mogrt-word.anim-2{animation:cadrAnimZoom .34s cubic-bezier(.2,.9,.3,1.2) forwards}
+.mogrt-word.anim-3{animation:cadrAnimTracking .38s ease-out forwards}
+.mogrt-word.anim-4{animation:cadrAnimBlur .36s ease-out forwards}
+.mogrt-word.anim-5{animation:cadrAnimFade .36s ease-in-out forwards}
+
+
+/* ======================= DIRECT WORD-COUNT CONTROLLER ======================= */
+.wc-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.wc-pills{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:4px;
+  direction:ltr;
+}
+.wc-pill{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:6px 2px;
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:11.5px;
+  color:var(--muted);
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1px;
+  line-height:1.1;
+}
+.wc-pill small{
+  font-family:var(--font-ui);
+  font-size:9px;
+  font-weight:500;
+  opacity:.8;
+}
+.wc-pill:hover:not(.on){
+  border-color:var(--line-hover);
+  color:var(--text);
+}
+.wc-pill.on{
+  background:var(--accent-soft);
+  border-color:var(--accent);
+  color:var(--text);
+  box-shadow:inset 0 0 0 1px rgba(255,107,53,.15);
+}
+.wc-pill.on b{
+  color:var(--accent);
+}
+.wc-stepper-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.wc-stepper{
+  display:inline-flex;
+  align-items:center;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:2px;
+  gap:4px;
+  direction:ltr;
+}
+.wc-step-btn{
+  width:24px;
+  height:22px;
+  border-radius:5px;
+  border:none;
+  background:var(--surface);
+  color:var(--text);
+  font-weight:700;
+  font-size:13px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.wc-step-btn:hover{
+  background:var(--accent);
+  color:#fff;
+}
+.wc-step-val{
+  min-width:58px;
+  text-align:center;
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:11.5px;
+  color:var(--accent);
+  cursor:pointer;
+}
+.cap-line-actions{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  flex:0 0 auto;
+}
+.cap-act-btn{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:5px;
+  color:var(--muted);
+  font-size:10px;
+  padding:3px 5px;
+  line-height:1;
+}
+.cap-act-btn:hover:not(:disabled){
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.cap-act-btn:disabled{
+  opacity:.3;
+}
+.cap-wc-tag{
+  font-family:var(--font-head);
+  font-size:9.5px;
+  font-weight:700;
+  color:var(--muted);
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:2px 4px;
+  min-width:22px;
+  text-align:center;
+  direction:ltr;
+}
+
+/* ======================= NARROW DOCKED PANEL SUPPORT ======================= */
+@media (max-width:315px){
+  .header{padding:8px 9px}
+  .tabs{padding:5px 8px;gap:3px}
+  .tab{font-size:10.5px;padding:6px 2px}
+  .main{padding:8px 8px 106px}
+  .cards{gap:4px}
+  .pre{font-size:10.5px;padding:6px 2px}
+  .btn{font-size:11.5px;padding:8px 6px}
+  .btn.primary{font-size:12px;padding:10px}
+}
+
+/* ======================= ANIMATION COMPOSER MOGRT GRID & HOVER PREVIEW ======================= */
+.ac-grid-wrap{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.ac-grid-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+}
+.ac-grid-sub{
+  font-size:10px;
+  color:var(--muted);
+}
+.ac-mogrt-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:7px;
+}
+.ac-card{
+  position:relative;
+  background:var(--panel);
+  border:1.5px solid var(--line);
+  border-radius:9px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  display:flex;
+  flex-direction:column;
+  user-select:none;
+}
+.ac-card:hover{
+  border-color:rgba(255,107,53,.75);
+  transform:translateY(-1px);
+  box-shadow:0 5px 14px rgba(0,0,0,.45);
+}
+.ac-card.active{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 5px 14px rgba(255,107,53,.18);
+}
+.ac-card-stage{
+  position:relative;
+  height:56px;
+  background:radial-gradient(ellipse at 50% 40%, #202430 0%, #101217 75%, #090A0D 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  padding:4px 6px;
+  direction:rtl;
+}
+.ac-card-badge{
+  position:absolute;
+  top:4px;
+  left:5px;
+  font-family:var(--font-head);
+  font-size:8.5px;
+  font-weight:700;
+  padding:1px 5px;
+  border-radius:4px;
+  background:rgba(11,12,15,.82);
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,.08);
+  pointer-events:none;
+}
+.ac-card.active .ac-card-badge{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+.ac-card-del{
+  position:absolute;
+  top:4px;
+  right:5px;
+  width:16px;
+  height:16px;
+  border-radius:4px;
+  background:rgba(11,12,15,.82);
+  border:1px solid rgba(255,255,255,.12);
+  color:var(--muted);
+  font-size:11px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+.ac-card-del:hover{
+  background:#dc2626;
+  color:#fff;
+  border-color:#dc2626;
+}
+.ac-card-foot{
+  padding:5px 7px;
+  background:var(--surface);
+  border-top:1px solid rgba(255,255,255,.05);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:4px;
+}
+.ac-card-title{
+  font-size:10.5px;
+  font-weight:700;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.ac-card-type{
+  font-size:9px;
+  color:var(--accent);
+  font-weight:700;
+  flex:0 0 auto;
+}
+
+/* Mini animated text inside each AC card + Big Monitor Stage animations */
+.ac-demo-wrap{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-family:'Cairo','Montserrat',sans-serif;
+  font-weight:800;
+  font-size:13px;
+  color:#F5F5F5;
+  white-space:nowrap;
+}
+.ac-word-mask{
+  display:inline-block;
+  overflow:hidden;
+  vertical-align:bottom;
+  padding:0 2px;
+}
+.ac-word-inner{
+  display:inline-block;
+}
+
+/* 1. Slide Up Words */
+@keyframes acSlideUpLoop{
+  0%{transform:translateY(115%);opacity:0}
+  18%{transform:translateY(0%);opacity:1}
+  78%{transform:translateY(0%);opacity:1}
+  95%,100%{transform:translateY(-110%);opacity:0}
+}
+/* 2. Smooth Zoom Pop (Orange) */
+@keyframes acZoomPopLoop{
+  0%{transform:scale(.25);opacity:0}
+  20%{transform:scale(1.18);opacity:1}
+  32%{transform:scale(1);opacity:1}
+  80%{transform:scale(1);opacity:1}
+  95%,100%{transform:scale(.4);opacity:0}
+}
+/* 3. Cinema Tracking */
+@keyframes acTrackingLoop{
+  0%{letter-spacing:-3px;opacity:0;transform:scale(.88)}
+  25%{letter-spacing:4.5px;opacity:1;transform:scale(1)}
+  80%{letter-spacing:4.5px;opacity:1;transform:scale(1)}
+  96%,100%{letter-spacing:8px;opacity:0;transform:scale(1.04)}
+}
+/* 4. Smooth Optical Blur */
+@keyframes acBlurLoop{
+  0%{filter:blur(9px);opacity:0;transform:scale(1.25)}
+  24%{filter:blur(0px);opacity:1;transform:scale(1)}
+  80%{filter:blur(0px);opacity:1;transform:scale(1)}
+  96%,100%{filter:blur(7px);opacity:0;transform:scale(.9)}
+}
+/* 5. Clean Broadcast Fade */
+@keyframes acCleanFadeLoop{
+  0%{opacity:0;transform:translateY(9px)}
+  25%{opacity:1;transform:translateY(0)}
+  80%{opacity:1;transform:translateY(0)}
+  96%,100%{opacity:0;transform:translateY(-6px)}
+}
+
+/* Card animations run gently at all times and speed up / highlight on hover */
+.ac-card[data-anim="1"] .ac-w1{animation:acSlideUpLoop 2.2s cubic-bezier(.2,.9,.3,1) infinite}
+.ac-card[data-anim="1"] .ac-w2{animation:acSlideUpLoop 2.2s cubic-bezier(.2,.9,.3,1) .18s infinite}
+.ac-card[data-anim="2"] .ac-w1{animation:acZoomPopLoop 2.2s cubic-bezier(.2,.9,.3,1.2) infinite}
+.ac-card[data-anim="2"] .ac-w2{animation:acZoomPopLoop 2.2s cubic-bezier(.2,.9,.3,1.2) .16s infinite;color:#FF6B35;background:rgba(255,107,53,.18);padding:0 5px;border-radius:4px;border:1px solid rgba(255,107,53,.5)}
+.ac-card[data-anim="3"] .ac-demo-wrap{animation:acTrackingLoop 2.4s ease-out infinite;border-bottom:1.5px solid rgba(255,107,53,.6);padding-bottom:2px}
+.ac-card[data-anim="4"] .ac-w1{animation:acBlurLoop 2.3s ease-out infinite}
+.ac-card[data-anim="4"] .ac-w2{animation:acBlurLoop 2.3s ease-out .18s infinite;color:#38BDF8}
+.ac-card[data-anim="5"] .ac-demo-wrap{animation:acCleanFadeLoop 2.4s ease-in-out infinite;background:rgba(16,17,20,.78);padding:2px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.14)}
+
+/* Stage Entrance Keyframes for #mogrtMonitor */
+@keyframes stageSlideUp{
+  0%{transform:translateY(120%);opacity:0}
+  100%{transform:translateY(0%);opacity:1}
+}
+@keyframes stageZoomIn{
+  0%{transform:scale(.22);opacity:0}
+  70%{transform:scale(1.15);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+@keyframes stageTrackingIn{
+  0%{letter-spacing:-3px;opacity:0;transform:scale(.86)}
+  100%{letter-spacing:3.5px;opacity:1;transform:scale(1)}
+}
+@keyframes stageBlurIn{
+  0%{filter:blur(10px);opacity:0;transform:scale(1.28)}
+  100%{filter:blur(0px);opacity:1;transform:scale(1)}
+}
+@keyframes stageFadeIn{
+  0%{opacity:0;transform:translateY(10px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+
+/* ======================= VISUAL FONT PICKER LIST ======================= */
+.vfont-picker-list{
+  max-height:172px;
+  overflow-y:auto;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:4px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.vfont-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:6px 9px;
+  border-radius:6px;
+  border:1px solid transparent;
+  background:rgba(255,255,255,.015);
+  cursor:pointer;
+  transition:all .12s ease;
+}
+.vfont-item:hover{
+  background:var(--surface-hover);
+  border-color:rgba(255,107,53,.5);
+}
+.vfont-item.active{
+  background:var(--accent-soft);
+  border-color:var(--accent);
+}
+.vfont-sample{
+  font-size:15px;
+  color:var(--text);
+  line-height:1.25;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.vfont-meta{
+  font-family:var(--font-ui);
+  font-size:10px;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:4px;
+  flex:0 0 auto;
+  direction:ltr;
+}
+.vfont-item.active .vfont-meta{
+  color:var(--accent);
+  font-weight:700;
+}
+
+
+/* ======================= INTERACTIVE WORD CHIPS & +1/-1 WORD SHIFT IN CAPTION EDITOR ======================= */
+.cap-line-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:5px 6px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  transition:border-color .12s ease;
+}
+.cap-line-card:hover{
+  border-color:var(--line-hover);
+}
+.cap-line-top{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.cap-line-bot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:4px;
+  padding-top:3px;
+  border-top:1px dashed rgba(255,255,255,.05);
+}
+.cap-word-chips{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:2px;
+  flex:1;
+}
+.cap-w-token{
+  font-size:10.5px;
+  color:var(--muted);
+  background:rgba(255,255,255,.03);
+  padding:1px 5px;
+  border-radius:4px;
+}
+.cap-w-cut{
+  background:transparent;
+  border:1px dashed rgba(255,107,53,.35);
+  color:var(--accent);
+  border-radius:4px;
+  font-size:9px;
+  padding:0 3px;
+  line-height:1.3;
+  cursor:pointer;
+  opacity:.65;
+  transition:all .12s ease;
+}
+.cap-w-cut:hover{
+  opacity:1;
+  background:var(--accent);
+  color:#fff;
+  border-style:solid;
+  transform:scale(1.1);
+}
+.cap-shift-btns{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  flex:0 0 auto;
+}
+.cap-shift-btn{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:4px;
+  color:var(--text);
+  font-family:var(--font-head);
+  font-size:9.5px;
+  font-weight:700;
+  padding:2px 5px;
+  line-height:1.1;
+  cursor:pointer;
+}
+.cap-shift-btn:hover:not(:disabled){
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.cap-shift-btn:disabled{
+  opacity:.28;
+  cursor:default;
+}
+.cap-live-stats{
+  font-size:10px;
+  color:var(--accent);
+  font-weight:700;
+  background:var(--accent-soft);
+  border:1px solid rgba(255,107,53,.3);
+  border-radius:5px;
+  padding:2px 6px;
+}
+
+
+/* ======================= COLORFUL SRT & MOGRT ACTION BUTTONS ======================= */
+.btn.btn-srt-import{
+  background:linear-gradient(135deg,#059669 0%,#10B981 100%) !important;
+  border:1px solid #34D399 !important;
+  color:#FFFFFF !important;
+  font-family:var(--font-head);
+  font-weight:700;
+  box-shadow:0 3px 12px rgba(16,185,129,.32),inset 0 1px 0 rgba(255,255,255,.22);
+  opacity:1 !important;
+}
+.btn.btn-srt-import:hover{
+  background:linear-gradient(135deg,#10B981 0%,#34D399 100%) !important;
+  box-shadow:0 5px 16px rgba(16,185,129,.45),inset 0 1px 0 rgba(255,255,255,.3);
+  transform:translateY(-1px);
+}
+.btn.btn-srt-export{
+  background:linear-gradient(135deg,#0284C7 0%,#0EA5E9 100%) !important;
+  border:1px solid #38BDF8 !important;
+  color:#FFFFFF !important;
+  font-family:var(--font-head);
+  font-weight:700;
+  box-shadow:0 3px 12px rgba(14,165,233,.32),inset 0 1px 0 rgba(255,255,255,.22);
+  opacity:1 !important;
+}
+.btn.btn-srt-export:hover{
+  background:linear-gradient(135deg,#0EA5E9 0%,#38BDF8 100%) !important;
+  box-shadow:0 5px 16px rgba(14,165,233,.45),inset 0 1px 0 rgba(255,255,255,.3);
+  transform:translateY(-1px);
+}
+.btn.btn-mogrt-jump{
+  background:linear-gradient(135deg,#7C3AED 0%,#9333EA 100%) !important;
+  border:1px solid #C084FC !important;
+  color:#FFFFFF !important;
+  font-family:var(--font-head);
+  font-weight:700;
+  box-shadow:0 3px 12px rgba(147,51,234,.32),inset 0 1px 0 rgba(255,255,255,.22);
+  opacity:1 !important;
+}
+.btn.btn-mogrt-jump:hover{
+  background:linear-gradient(135deg,#9333EA 0%,#A855F7 100%) !important;
+  box-shadow:0 5px 16px rgba(147,51,234,.45);
+  transform:translateY(-1px);
+}
+
+/* ======================= CUSTOM MOGRT DROPDOWN & BUILT-IN PREVIEW ======================= */
+.mogrt-dd-wrap{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.mogrt-dd-bar{
+  display:flex;
+  align-items:stretch;
+  gap:6px;
+}
+.mogrt-dd-trigger{
+  flex:1;
+  min-width:0;
+  background:var(--surface);
+  border:1.5px solid var(--accent-border);
+  border-radius:10px;
+  padding:7px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  text-align:start;
+  box-shadow:0 3px 12px rgba(0,0,0,.28);
+}
+.mogrt-dd-trigger:hover{
+  border-color:var(--accent);
+  background:var(--surface-hover);
+}
+.mogrt-dd-trigger.open{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px var(--accent-soft);
+}
+.mogrt-dd-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  flex:1;
+}
+.mogrt-dd-mini-thumb{
+  width:44px;
+  height:28px;
+  border-radius:5px;
+  background:radial-gradient(circle at 50% 40%,#252936 0%,#0E1015 100%);
+  border:1px solid var(--line-hover);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  flex:0 0 44px;
+  font-family:var(--font-head);
+  font-size:9px;
+  font-weight:800;
+  color:var(--accent);
+}
+.mogrt-dd-mini-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.mogrt-dd-titles{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  flex:1;
+  line-height:1.25;
+}
+.mogrt-dd-name{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:12px;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mogrt-dd-sub{
+  font-size:10px;
+  color:var(--accent);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mogrt-dd-caret{
+  font-size:12px;
+  color:var(--accent);
+  font-weight:800;
+  flex:0 0 auto;
+  transition:transform .15s ease;
+}
+.mogrt-dd-trigger.open .mogrt-dd-caret{
+  transform:rotate(180deg);
+}
+.mogrt-dd-menu{
+  display:none;
+  flex-direction:column;
+  gap:6px;
+  background:var(--panel);
+  border:1.5px solid var(--accent);
+  border-radius:10px;
+  padding:8px;
+  box-shadow:0 10px 28px rgba(0,0,0,.65);
+  max-height:270px;
+  overflow-y:auto;
+  z-index:20;
+}
+.mogrt-dd-menu.open{
+  display:flex;
+}
+.mogrt-dd-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:9px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:6px 8px;
+  cursor:pointer;
+  transition:all .14s ease;
+}
+.mogrt-dd-item:hover{
+  border-color:var(--accent);
+  background:var(--surface-hover);
+  transform:translateY(-1px);
+}
+.mogrt-dd-item.active{
+  border-color:var(--accent);
+  background:var(--accent-soft);
+  box-shadow:inset 0 0 0 1px rgba(255,107,53,.2);
+}
+.mogrt-dd-item-prev{
+  position:relative;
+  width:88px;
+  height:50px;
+  border-radius:6px;
+  background:radial-gradient(ellipse at 50% 40%,#222634 0%,#0B0C0F 100%);
+  border:1px solid var(--line-hover);
+  overflow:hidden;
+  flex:0 0 88px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.mogrt-dd-item-prev img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.mogrt-dd-item-prev .dd-live-anim{
+  position:absolute;
+  inset:0;
+  background:rgba(11,12,15,.48);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"Cairo","Montserrat",sans-serif;
+  font-weight:800;
+  font-size:11px;
+  color:#FFF;
+  text-shadow:0 2px 6px rgba(0,0,0,.9);
+  opacity:0;
+  transition:opacity .15s ease;
+}
+.mogrt-dd-item:hover .dd-live-anim{
+  opacity:1;
+}
+.mogrt-dd-item-info{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+  flex:1;
+}
+.mogrt-dd-item-title{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:12px;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mogrt-dd-item-meta{
+  font-size:10px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mogrt-dd-item.active .mogrt-dd-item-meta{
+  color:var(--accent);
+  font-weight:600;
+}
+.mogrt-dd-item-del{
+  background:rgba(239,68,68,.12);
+  border:1px solid rgba(239,68,68,.32);
+  color:#FCA5A5;
+  border-radius:6px;
+  width:26px;
+  height:26px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 26px;
+  font-size:12px;
+  padding:0;
+}
+.mogrt-dd-item-del:hover{
+  background:var(--danger);
+  border-color:var(--danger);
+  color:#FFF;
+}
+
+/* Built-in Preview Strip for the Selected MOGRT */
+.mogrt-preview-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.mogrt-preview-thumb-box{
+  position:relative;
+  width:112px;
+  height:64px;
+  border-radius:7px;
+  background:radial-gradient(ellipse at 50% 40%,#232735 0%,#0B0C0F 100%);
+  border:1px solid var(--line-hover);
+  overflow:hidden;
+  flex:0 0 112px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.mogrt-preview-thumb-box img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.mogrt-preview-live-stage{
+  flex:1;
+  min-width:0;
+  height:64px;
+  border-radius:7px;
+  background:radial-gradient(ellipse at 50% 35%,#1F2330 0%,#0E1015 80%);
+  border:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:4px 8px;
+  overflow:hidden;
+  position:relative;
+}
+.mogrt-preview-live-text{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-weight:800;
+  font-size:15px;
+  color:#F5F5F5;
+  text-shadow:0 2px 8px rgba(0,0,0,.85);
+  white-space:nowrap;
+  direction:rtl;
+}
+.mogrt-preview-live-sub{
+  position:absolute;
+  bottom:3px;
+  left:6px;
+  right:6px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:9px;
+  color:var(--muted);
+  direction:ltr;
+}
+
+
+/* ======================= LIVE ANIMATED PREVIEW INSIDE MOGRT DROPDOWN ======================= */
+.mogrt-dd-mini-thumb{
+  width:68px !important;
+  height:34px !important;
+  flex:0 0 68px !important;
+  position:relative;
+  background:radial-gradient(ellipse at 50% 40%,#242836 0%,#0E1015 100%) !important;
+  border:1px solid rgba(255,107,53,.45) !important;
+  border-radius:6px !important;
+}
+.mogrt-dd-mini-thumb img,
+.mogrt-dd-mini-thumb video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.35;
+}
+.mogrt-dd-mini-thumb .dd-mini-stage{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  font-family:"Cairo","Montserrat",sans-serif;
+  font-weight:800;
+  font-size:9.5px;
+  color:#FFF;
+  text-shadow:0 1px 4px rgba(0,0,0,.95);
+  white-space:nowrap;
+  direction:rtl;
+}
+.mogrt-dd-item-prev{
+  width:118px !important;
+  height:54px !important;
+  flex:0 0 118px !important;
+  position:relative;
+  background:radial-gradient(ellipse at 50% 35%,#252A3A 0%,#0D0F14 100%) !important;
+  border:1px solid rgba(255,107,53,.4) !important;
+  border-radius:7px !important;
+  overflow:hidden;
+}
+.mogrt-dd-item-prev img.dd-bg-thumb{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.32;
+  pointer-events:none;
+}
+.mogrt-dd-item-prev video.dd-bg-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:3;
+}
+.dd-stage-box{
+  position:relative;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  padding:2px 6px;
+  border-radius:5px;
+  background:rgba(11,12,15,.55);
+  font-family:"Cairo","Montserrat",sans-serif;
+  font-weight:800;
+  font-size:11.5px;
+  color:#F5F5F5;
+  text-shadow:0 2px 6px rgba(0,0,0,.95);
+  white-space:nowrap;
+  direction:rtl;
+}
+.dd-stage-tag{
+  position:absolute;
+  bottom:2px;
+  right:4px;
+  z-index:4;
+  font-family:var(--font-head);
+  font-size:8px;
+  font-weight:700;
+  color:var(--accent);
+  background:rgba(11,12,15,.82);
+  padding:0 4px;
+  border-radius:3px;
+  direction:ltr;
+}
+/* Live motion animations inside dropdown item preview */
+.mogrt-dd-item[data-anim="1"] .dd-w1,
+.mogrt-dd-trigger[data-anim="1"] .dd-w1{animation:acSlideUpLoop 1.9s cubic-bezier(.2,.9,.3,1) infinite}
+.mogrt-dd-item[data-anim="1"] .dd-w2,
+.mogrt-dd-trigger[data-anim="1"] .dd-w2{animation:acSlideUpLoop 1.9s cubic-bezier(.2,.9,.3,1) .16s infinite;color:#FF6B35}
+
+.mogrt-dd-item[data-anim="2"] .dd-w1,
+.mogrt-dd-trigger[data-anim="2"] .dd-w1{animation:acZoomPopLoop 1.9s cubic-bezier(.2,.9,.3,1.2) infinite}
+.mogrt-dd-item[data-anim="2"] .dd-w2,
+.mogrt-dd-trigger[data-anim="2"] .dd-w2{animation:acZoomPopLoop 1.9s cubic-bezier(.2,.9,.3,1.2) .15s infinite;color:#FF6B35;background:rgba(255,107,53,.2);padding:0 4px;border-radius:3px}
+
+.mogrt-dd-item[data-anim="3"] .dd-stage-box,
+.mogrt-dd-trigger[data-anim="3"] .dd-mini-stage{animation:acTrackingLoop 2.0s ease-out infinite;border-bottom:1.5px solid #FF6B35}
+
+.mogrt-dd-item[data-anim="4"] .dd-w1,
+.mogrt-dd-trigger[data-anim="4"] .dd-w1{animation:acBlurLoop 1.9s ease-out infinite}
+.mogrt-dd-item[data-anim="4"] .dd-w2,
+.mogrt-dd-trigger[data-anim="4"] .dd-w2{animation:acBlurLoop 1.9s ease-out .16s infinite;color:#38BDF8}
+
+.mogrt-dd-item[data-anim="5"] .dd-stage-box,
+.mogrt-dd-trigger[data-anim="5"] .dd-mini-stage{animation:acCleanFadeLoop 2.0s ease-in-out infinite}
+
+
+/* ======================= ANIMATION COMPOSER DROPDOWN BROWSER & HOVER STAGE ======================= */
+.ac-dd-preview-banner{
+  position:relative;
+  height:74px;
+  border-radius:8px;
+  background:radial-gradient(ellipse at 50% 35%,#252A3A 0%,#101218 70%,#090A0D 100%);
+  border:1px solid rgba(255,107,53,.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  padding:6px 10px;
+  box-shadow:inset 0 0 18px rgba(0,0,0,.65);
+}
+.ac-dd-preview-banner img.ac-banner-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.28;
+  pointer-events:none;
+}
+.ac-dd-preview-banner video.ac-banner-vid{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:2;
+}
+.ac-banner-top{
+  position:absolute;
+  top:4px;
+  left:7px;
+  right:7px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  z-index:4;
+  font-size:9px;
+  color:var(--muted);
+  pointer-events:none;
+}
+.ac-banner-badge{
+  background:rgba(11,12,15,.85);
+  border:1px solid rgba(255,107,53,.45);
+  color:var(--accent);
+  font-family:var(--font-head);
+  font-weight:700;
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:8.5px;
+}
+.ac-banner-stage{
+  position:relative;
+  z-index:3;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:3px 10px;
+  border-radius:6px;
+  background:rgba(11,12,15,.55);
+  font-family:"Cairo","Montserrat",sans-serif;
+  font-weight:800;
+  font-size:15px;
+  color:#F5F5F5;
+  text-shadow:0 2px 8px rgba(0,0,0,.95);
+  direction:rtl;
+  white-space:nowrap;
+}
+.ac-dd-preview-banner[data-anim="1"] .ac-bw1{animation:acSlideUpLoop 1.6s cubic-bezier(.2,.9,.3,1) infinite}
+.ac-dd-preview-banner[data-anim="1"] .ac-bw2{animation:acSlideUpLoop 1.6s cubic-bezier(.2,.9,.3,1) .14s infinite;color:#FF6B35}
+.ac-dd-preview-banner[data-anim="1"] .ac-bw3{animation:acSlideUpLoop 1.6s cubic-bezier(.2,.9,.3,1) .28s infinite}
+
+.ac-dd-preview-banner[data-anim="2"] .ac-bw1{animation:acZoomPopLoop 1.6s cubic-bezier(.2,.9,.3,1.2) infinite}
+.ac-dd-preview-banner[data-anim="2"] .ac-bw2{animation:acZoomPopLoop 1.6s cubic-bezier(.2,.9,.3,1.2) .14s infinite;color:#FF6B35;background:rgba(255,107,53,.22);padding:0 5px;border-radius:4px;border:1px solid rgba(255,107,53,.5)}
+.ac-dd-preview-banner[data-anim="2"] .ac-bw3{animation:acZoomPopLoop 1.6s cubic-bezier(.2,.9,.3,1.2) .28s infinite}
+
+.ac-dd-preview-banner[data-anim="3"] .ac-banner-stage{animation:acTrackingLoop 1.8s ease-out infinite;border-bottom:2px solid #FF6B35}
+
+.ac-dd-preview-banner[data-anim="4"] .ac-bw1{animation:acBlurLoop 1.7s ease-out infinite}
+.ac-dd-preview-banner[data-anim="4"] .ac-bw2{animation:acBlurLoop 1.7s ease-out .15s infinite;color:#38BDF8}
+.ac-dd-preview-banner[data-anim="4"] .ac-bw3{animation:acBlurLoop 1.7s ease-out .30s infinite}
+
+.ac-dd-preview-banner[data-anim="5"] .ac-banner-stage{animation:acCleanFadeLoop 1.8s ease-in-out infinite}
+
+/* ======================= CUSTOM FONT DROPDOWN MENU ======================= */
+.font-dd-wrap{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.font-dd-btn{
+  width:100%;
+  background:var(--panel);
+  border:1px solid var(--line-hover);
+  border-radius:8px;
+  padding:7px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  cursor:pointer;
+  text-align:start;
+}
+.font-dd-btn:hover,
+.font-dd-btn.open{
+  border-color:var(--accent);
+}
+.font-dd-btn-sample{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.font-dd-btn-meta{
+  font-size:10.5px;
+  color:var(--accent);
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex:0 0 auto;
+  direction:ltr;
+}
+.font-dd-panel{
+  display:none;
+  flex-direction:column;
+  gap:6px;
+  background:var(--panel);
+  border:1.5px solid var(--accent);
+  border-radius:9px;
+  padding:7px;
+  box-shadow:0 8px 24px rgba(0,0,0,.65);
+  z-index:18;
+}
+.font-dd-panel.open{
+  display:flex;
+}
+
+/* ======================= SLIDER + DIRECT NUMBER INPUT ROW ======================= */
+.slider-num-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  direction:ltr;
+}
+.slider-num-row input[type=range]{
+  flex:1;
+  min-width:0;
+}
+.slider-num-row input[type=number]{
+  width:68px !important;
+  flex:0 0 68px !important;
+  padding:4px 6px !important;
+  text-align:center;
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:12px;
+  background:var(--panel);
+  border:1px solid var(--line-hover);
+  border-radius:6px;
+  color:var(--accent);
+  direction:ltr;
+}
+.slider-num-row input[type=number]:focus{
+  border-color:var(--accent);
+  color:var(--text);
+}
+
+
+/* ======================= GITHUB OTA AUTO-UPDATE BANNER ======================= */
+.update-banner{
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin:8px 12px 0;
+  padding:8px 11px;
+  border-radius:9px;
+  background:linear-gradient(135deg,rgba(16,185,129,.18) 0%,rgba(5,150,105,.28) 100%);
+  border:1px solid #10B981;
+  box-shadow:0 4px 14px rgba(16,185,129,.22);
+}
+.update-banner.show{
+  display:flex;
+}
+.update-banner-info{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+  flex:1;
+}
+.update-banner-title{
+  font-family:var(--font-head);
+  font-weight:800;
+  font-size:11.5px;
+  color:#FFF;
+}
+.update-banner-notes{
+  font-size:10.5px;
+  color:#A7F3D0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.btn-update-now{
+  background:linear-gradient(135deg,#059669 0%,#10B981 100%) !important;
+  border:1px solid #34D399 !important;
+  color:#FFF !important;
+  font-family:var(--font-head);
+  font-weight:800;
+  font-size:11px;
+  padding:5px 10px;
+  border-radius:6px;
+  flex:0 0 auto;
+  box-shadow:0 2px 8px rgba(16,185,129,.35);
+}
+.btn-update-now:hover{
+  background:linear-gradient(135deg,#10B981 0%,#34D399 100%) !important;
+  transform:translateY(-1px);
+}
+
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- CADR STUDIO Official Brand Symbol (Geometric C-Frame + Cinema Orange Play) -->
+    <symbol id="i-cadr-logo" viewBox="0 0 64 64">
+      <polygon points="10,27 20,25 20,39 10,37" fill="#858585"/>
+      <polygon points="10,29 10,39 27,52 52,52 43,43 31,43 20,34" fill="#DCDFE6"/>
+      <polygon points="10,37 10,25 27,12 52,12 43,21 31,21 20,30" fill="#F5F5F5"/>
+      <path d="M32 23.5 C32 22.2 33.4 21.4 34.5 22.1 L46.5 29.6 C47.6 30.3 47.6 31.7 46.5 32.4 L34.5 39.9 C33.4 40.6 32 39.8 32 38.5 Z" fill="var(--accent)"/>
+    </symbol>
+    <symbol id="i-cut" viewBox="0 0 24 24">
+      <circle cx="6" cy="6" r="3"/>
+      <circle cx="6" cy="18" r="3"/>
+      <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+      <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+      <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+    </symbol>
+    <symbol id="i-caption" viewBox="0 0 24 24">
+      <path d="M4 8V6a2 2 0 0 1 2-2h2"/>
+      <path d="M4 16v2a2 2 0 0 0 2 2h2"/>
+      <path d="M16 4h2a2 2 0 0 1 2 2v2"/>
+      <path d="M16 20h2a2 2 0 0 0 2-2v-2"/>
+      <path d="M8 10h8"/>
+      <path d="M8 14h5"/>
+    </symbol>
+    <symbol id="i-style" viewBox="0 0 24 24">
+      <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+      <polyline points="2 17 12 22 22 17"/>
+      <polyline points="2 12 12 17 22 12"/>
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13 -8z"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M9 5a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M8 21h8"/><path d="M12 17v4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"/><path d="M11 4h2"/><path d="M12 17v.01"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></symbol>
+    <symbol id="i-lines" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h14"/></symbol>
+    <symbol id="i-word" viewBox="0 0 24 24"><path d="M14 15.5a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0"/><path d="M3 19v-10.5a3.5 3.5 0 0 1 7 0v10.5"/><path d="M3 13h7"/><path d="M21 12v7"/></symbol>
+    <symbol id="i-wrap" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 18h5"/><path d="M4 12h13a3 3 0 0 1 0 6h-4l2 -2m0 4l-2 -2"/></symbol>
+  </defs>
+</svg>
+
+<!-- ======================= HEADER ======================= -->
+<div class="header" dir="ltr">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg><use href="#i-cadr-logo"/></svg>
+    </div>
+    <div class="brand-text">
+      <div class="logo">CADR <span>CUT</span></div>
+      <div class="by" data-i18n="headerSub">Premiere Pro Plugin • CADR STUDIO</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button id="langToggleBtn" class="lang-toggle" type="button" onclick="cadrToggleUiLang()" title="Switch UI Language (العربية / English)"><b>AR</b> | EN</button>
+    <span class="pr-badge" title="Adobe Premiere Pro Extension">Pr</span>
+    <button id="tabSettings" class="gear-btn" type="button" onclick="cadrToggleSettings()" title="Settings / الإعدادات" aria-label="Settings">
+      <svg class="ic"><use href="#i-settings"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ======================= TABS ======================= -->
+<div class="tabs">
+  <button id="tabCut" class="tab active" onclick="showTab('cut')">
+    <svg class="ic"><use href="#i-cut"/></svg>
+    <span data-i18n="tabCut">Auto Cut</span>
+  </button>
+  <button id="tabCaption" class="tab" onclick="showTab('caption')">
+    <svg class="ic"><use href="#i-caption"/></svg>
+    <span data-i18n="tabCaption">Auto Caption</span>
+  </button>
+  <button id="tabStyle" class="tab" onclick="showTab('style')">
+    <svg class="ic"><use href="#i-style"/></svg>
+    <span data-i18n="tabStyle">Style</span>
+  </button>
+</div>
+
+<!-- ======================= ONE-CLICK OTA UPDATE BANNER ======================= -->
+<div id="cadrUpdateBanner" class="update-banner" dir="rtl">
+  <div class="update-banner-info">
+    <span class="update-banner-title" id="cadrUpdateBannerTitle">🚀 متاح تحديث جديد للبلاجن!</span>
+    <span class="update-banner-notes" id="cadrUpdateBannerNotes">اضغط للتحديث فورًا بدون قفل بريمير</span>
+  </div>
+  <button type="button" class="btn-update-now" id="cadrUpdateBannerBtn" onclick="cadrPerformOneClickUpdate()">تحديث الآن ⚡</button>
+</div>
+
+<div class="main">
+
+<!-- ======================= AUTO CUT ======================= -->
+<div id="cut" class="tabpanel active">
+
+  <div class="sel">
+    <span id="cutSelectionDot" class="status-dot warn"></span>
+    <span id="selectedClips" class="sel-text" dir="auto" data-i18n="noClip">No clip selected.</span>
+    <button class="sel-refresh" type="button" onclick="refreshSelection()" title="Refresh timeline selection" aria-label="Refresh selection">↻</button>
+  </div>
+
+  <div class="cards" id="presetRow">
+    <button class="pre" data-k="yt" title="YouTube: natural pace, medium pauses kept"><svg class="ic"><use href="#i-play"/></svg><span data-i18n="preYt">YouTube</span></button>
+    <button class="pre" data-k="pod" title="Podcast: keeps natural pauses"><svg class="ic"><use href="#i-mic"/></svg><span data-i18n="prePod">Podcast</span></button>
+    <button class="pre" data-k="sh" title="Shorts: tight and fast"><svg class="ic"><use href="#i-phone"/></svg><span data-i18n="preSh">Shorts</span></button>
+    <button class="pre slim" id="presetAddBtn" title="Save current settings as a preset" aria-label="Save as preset"><svg class="ic"><use href="#i-plus"/></svg></button>
+  </div>
+  <div id="myPresets" class="chips"></div>
+  <div id="presetSaveRow" class="inline" style="display:none">
+    <input id="presetName" type="text" placeholder="Preset name" data-i18n-placeholder="presetNamePh" dir="auto" maxlength="40">
+    <button class="btn sm" id="presetSaveBtn" data-i18n="saveBtn">Save</button>
+  </div>
+  <select id="presetSelect" style="display:none" onchange="loadSelectedPreset()"><option value="">—</option></select>
+
+  <div class="btn-col">
+    <button id="cutButton" class="btn primary" onclick="runAutoCut()" data-i18n="runAutoCutBtn">Auto Cut</button>
+    <div class="btn-row">
+      <button id="previewButton" class="btn" onclick="previewSilence()" data-i18n="previewBtn">Preview</button>
+      <button id="undoCutButton" class="btn cadr-undo-btn" onclick="undoLastCut('cutStatus')" title="Restore sequence before last cut" disabled data-i18n="undoBtn">Undo</button>
+    </div>
+  </div>
+
+  <details class="card" id="cutSettings" open>
+    <summary><span><span data-i18n="cutSettingsTitle">Cut Settings</span> <span id="presetLabel" class="muted" style="font-weight:500;font-size:11.5px;margin-inline-start:4px"></span></span></summary>
+    <div class="body">
+      <div class="slider-row"><span data-i18n="minSilence">Minimum silence</span><b id="v_silenceDuration" data-slider="silenceDuration" title="Click to type exact value"></b></div>
+      <input type="range" id="silenceDuration" min="0.1" max="1.5" step="0.05" value="0.40">
+      <div class="slider-row"><span data-i18n="noiseThresh">Noise threshold</span><b id="v_noiseThreshold" data-slider="noiseThreshold" title="Click to type exact value"></b></div>
+      <input type="range" id="noiseThreshold" min="-60" max="-10" step="1" value="-25">
+      <div class="slider-row"><span data-i18n="padBefore">Padding before</span><b id="v_paddingBefore" data-slider="paddingBefore" title="Click to type exact value"></b></div>
+      <input type="range" id="paddingBefore" min="0" max="0.3" step="0.01" value="0.08">
+      <div class="slider-row"><span data-i18n="padAfter">Padding after</span><b id="v_paddingAfter" data-slider="paddingAfter" title="Click to type exact value"></b></div>
+      <input type="range" id="paddingAfter" min="0" max="0.3" step="0.01" value="0.08">
+      <div class="sep"></div>
+      <div class="row"><span class="lb" data-i18n="smoothCuts">Smooth cuts</span>
+        <span class="chips">
+          <label class="chip"><input type="checkbox" id="smoothVideo"><span data-i18n="videoLbl">Video</span></label>
+          <label class="chip"><input type="checkbox" id="smoothAudio"><span data-i18n="audioLbl">Audio</span></label>
+        </span>
+      </div>
+      <div id="smoothWrap">
+        <div class="slider-row"><span data-i18n="smoothLen">Smooth length</span><b id="v_smoothFrames" data-slider="smoothFrames" title="Click to type exact value"></b></div>
+        <input type="range" id="smoothFrames" min="1" max="12" step="1" value="3">
+      </div>
+      <div class="card-note" data-i18n="smoothNote">إضافة انتقال تلقائي بعد القص (Cross Dissolve للفيديو، Crossfade للصوت). من 2 لـ 4 فريم أحسن.</div>
+      <div class="sep"></div>
+      <div class="row"><span class="lb" data-i18n="autoZoom">Auto zoom</span>
+        <label class="chip"><input type="checkbox" id="autoZoom"><span data-i18n="onLbl">On</span></label>
+      </div>
+      <div id="zoomWrap" class="dim">
+        <div class="slider-row"><span data-i18n="zoomAmountLbl">Zoom amount</span><b id="v_zoomAmount" data-slider="zoomAmount" title="Click to type exact value"></b></div>
+        <input type="range" id="zoomAmount" min="103" max="135" step="1" value="112">
+      </div>
+      <div class="card-note" data-i18n="zoomNote">بعد القص، كل لقطة تانية بتتكبّر شوية فالقفزات تبان حركة كاميرا مقصودة. للفيديو بس.</div>
+    </div>
+  </details>
+
+  <details class="log"><summary><span data-i18n="activityLog">Activity Log</span></summary><div id="cutStatus" class="status" dir="auto">Ready.</div></details>
+</div>
+
+<!-- ======================= AUTO CAPTION ======================= -->
+<div id="caption" class="tabpanel">
+
+  <div class="sel">
+    <span id="captionSelectionDot" class="status-dot warn"></span>
+    <span id="captionSelectedClip" class="sel-text" dir="auto" data-i18n="noClip">No clip selected.</span>
+    <button class="sel-refresh" type="button" onclick="refreshCaptionSelection()" title="Refresh timeline selection" aria-label="Refresh selection">↻</button>
+  </div>
+
+  <div class="row"><span class="lb" data-i18n="langLbl">Language</span>
+    <span class="chips" id="langChips">
+      <button class="chip" data-lang="auto" data-i18n="langAuto">Auto</button>
+      <button class="chip" data-lang="Arabic" data-i18n="langAr">Arabic</button>
+      <button class="chip" data-lang="English" data-i18n="langEn">English</button>
+    </span>
+  </div>
+  <select id="captionLanguage" style="display:none">
+    <option value="auto">Auto Detect</option><option value="Arabic">Arabic</option><option value="English">English</option>
+  </select>
+
+  <!-- Direct Word Count Controller -->
+  <div class="wc-card">
+    <div class="wc-stepper-row">
+      <span class="card-title" data-i18n="wcBarTitle">Words per Caption</span>
+      <div class="seg-row" id="wcModeSeg" style="width:162px">
+        <button type="button" class="seg-btn on" data-wcmode="strict" onclick="cadrSetWordCountMode('strict')" data-i18n="wcStrictBtn" title="Exact number of words in every caption">Exact Count</button>
+        <button type="button" class="seg-btn" data-wcmode="smart" onclick="cadrSetWordCountMode('smart')" data-i18n="wcSmartBtn" title="Up to N words, splitting naturally at pauses">Smart Pause</button>
+      </div>
+      <input type="hidden" id="wordCountMode" value="strict">
+    </div>
+
+    <div class="wc-pills" id="wcQuickPills" style="grid-template-columns:repeat(7,1fr)">
+      <button type="button" class="wc-pill" data-w="1" onclick="cadrSetExactWordCount(1)"><b>1</b><small data-i18n="w1Sub">كلمة</small></button>
+      <button type="button" class="wc-pill" data-w="2" onclick="cadrSetExactWordCount(2)"><b>2</b><small data-i18n="w2Sub">كلمتين</small></button>
+      <button type="button" class="wc-pill on" data-w="3" onclick="cadrSetExactWordCount(3)"><b>3</b><small data-i18n="w3Sub">ريلز</small></button>
+      <button type="button" class="wc-pill" data-w="4" onclick="cadrSetExactWordCount(4)"><b>4</b><small data-i18n="w4Sub">سوشيال</small></button>
+      <button type="button" class="wc-pill" data-w="5" onclick="cadrSetExactWordCount(5)"><b>5</b><small data-i18n="w5Sub">متوازن</small></button>
+      <button type="button" class="wc-pill" data-w="6" onclick="cadrSetExactWordCount(6)"><b>6</b><small data-i18n="w6Sub">متوسط</small></button>
+      <button type="button" class="wc-pill" data-w="8" onclick="cadrSetExactWordCount(8)"><b>8+</b><small data-i18n="w8Sub">سينما</small></button>
+    </div>
+
+    <div class="wc-stepper-row">
+      <div class="wc-stepper">
+        <button type="button" class="wc-step-btn" onclick="cadrStepWordCount(-1)" title="Decrease words">−</button>
+        <span id="wcStepperDisplay" class="wc-step-val" onclick="document.getElementById('v_wordsPerLine').click()" title="Click to type custom number">3 words</span>
+        <button type="button" class="wc-step-btn" onclick="cadrStepWordCount(1)" title="Increase words">+</button>
+      </div>
+      <div class="seg-row" id="maxLinesSeg" style="flex:1">
+        <button type="button" class="seg-btn on" data-lines="1" onclick="cadrSetMaxLines(1)" data-i18n="oneLineBtn">1 Line (Reels)</button>
+        <button type="button" class="seg-btn" data-lines="2" onclick="cadrSetMaxLines(2)" data-i18n="twoLinesBtn">2 Lines (YT)</button>
+      </div>
+      <input type="hidden" id="maxLinesPerCaption" value="1">
+    </div>
+
+
+  </div>
+  <div class="cards" id="styleRow" style="display:none">
+    <button class="pre" data-words="8"><span data-i18n="modeLines">Lines</span></button>
+    <button class="pre" data-words="1"><span data-i18n="modeWord">Word by word</span></button>
+    <button class="pre" data-words="3"><span data-i18n="modePhrase">Short phrases</span></button>
+  </div>
+
+  <div class="btn-col">
+    <button id="captionButton" class="btn primary" onclick="runCaption()" data-i18n="genCaptionsBtn">Generate Captions</button>
+    <div class="btn-row">
+      <button id="importCaptionsButton" class="btn btn-srt-import" onclick="importPendingCaptions()" data-i18n="addTimelineBtn">Add SRT Track</button>
+      <button id="exportSrtButton" class="btn btn-srt-export" onclick="cadrExportSrt()" data-i18n="exportSrtBtn">Export SRT</button>
+      <button class="btn btn-mogrt-jump" type="button" onclick="showTab('style')" title="Open MOGRT Style Tab" data-i18n="goToMogrtBtn">MOGRT Style ✦</button>
+    </div>
+  </div>
+
+    <div class="card pad">
+    <div class="row" style="margin-bottom:8px">
+      <span class="card-title" data-i18n="capEditorTitle">Caption Editor</span>
+      <span class="chips" id="capEditorModeChips">
+        <button class="chip on" type="button" data-cap-mode="lines" onclick="cadrSetCapEditorMode('lines')" data-i18n="visualLinesBtn">Visual Lines</button>
+        <button class="chip" type="button" data-cap-mode="raw" onclick="cadrSetCapEditorMode('raw')" data-i18n="rawSrtBtn">Raw SRT</button>
+      </span>
+    </div>
+    <div class="inline" style="margin-bottom:8px">
+      <select id="translateTo" aria-label="Translate to"></select>
+      <button id="translateButton" class="btn sm" type="button" data-i18n="translateBtn">Translate</button>
+    </div>
+    <div id="trView" class="chips" style="display:none;margin-bottom:8px">
+      <button class="chip" data-view="original" data-i18n="origViewBtn">Original</button>
+      <button class="chip" id="trTranslationChip" data-view="translation">Translation</button>
+    </div>
+    <div id="captionVisualLines" class="cap-lines-box"></div>
+    <textarea id="captionPreview" placeholder="SRT preview will appear here..." dir="ltr" style="display:none"></textarea>
+  </div>
+
+
+<details class="card" id="proCapSettingsCard">
+    <summary><span data-i18n="capSettingsTitle">Pro Caption Studio Settings</span></summary>
+    <div class="body" style="gap:8px;padding-top:6px">
+
+
+      <!-- Hidden internal inputs (all 6 sliders removed per user request) -->
+      <div style="display:none">
+        <b id="v_wordsPerLine">3</b><input type="hidden" id="wordsPerLine" value="3">
+        <b id="v_maxCharsPerLine">42</b><input type="hidden" id="maxCharsPerLine" value="42">
+        <b id="v_captionGapBridge">0.12 s</b><input type="hidden" id="captionGapBridge" value="0.12">
+        <b id="v_captionTimeOffset">0 ms</b><input type="hidden" id="captionTimeOffset" value="0">
+        <b id="v_minCaptionDuration">0 s</b><input type="hidden" id="minCaptionDuration" value="0">
+        <b id="v_capPauseSplit">0.35 s</b><input type="hidden" id="capPauseSplit" value="0.35">
+      </div>
+
+      <!-- Row 4: Smart Formatting Toggles -->
+      <div class="cap-toggles-grid">
+        <label class="cap-toggle-card on" id="lbl_naturalSplit">
+          <span data-i18n="natSplit">Smart pause split</span>
+          <input type="checkbox" id="naturalSplit" checked onchange="cadrOnCapToggleChange()">
+        </label>
+        <label class="cap-toggle-card on" id="lbl_stripPunctuation">
+          <span data-i18n="stripPunctLbl">Hide punctuation</span>
+          <input type="checkbox" id="stripPunctuation" checked onchange="cadrOnCapToggleChange()">
+        </label>
+        <label class="cap-toggle-card on" id="lbl_stripTashkeel">
+          <span data-i18n="stripTashkeelLbl">Strip Tashkeel</span>
+          <input type="checkbox" id="stripTashkeel" checked onchange="cadrOnCapToggleChange()">
+        </label>
+        <label class="cap-toggle-card on" id="lbl_wordLevelCaptions">
+          <span data-i18n="wordTiming">Word-level sync</span>
+          <input type="checkbox" id="wordLevelCaptions" checked onchange="cadrOnCapToggleChange()">
+        </label>
+      </div>
+
+      <div class="sep"></div>
+      <div class="row" style="margin-bottom:2px"><span class="lb" id="fillerLabel" data-i18n="fillerFlagLbl">Filler words to flag & remove</span></div>
+      <div class="chips" id="customFillerWordsList"></div>
+      <div class="inline" id="fillerAddRow" style="display:none;margin-top:4px">
+        <input id="newFillerWord" type="text" placeholder="مثال: بص" data-i18n-placeholder="fillerPh" dir="auto">
+        <button class="btn sm" onclick="addCustomFillerWord()" data-i18n="addBtn">Add</button>
+      </div>
+    </div>
+  </details>
+
+  <div id="fillerWordsBox" class="card pad">
+    <div class="row" style="align-items:flex-start;flex-wrap:wrap">
+      <div><div class="card-title" data-i18n="fillerFoundTitle">Filler Words Found</div><div class="card-note" data-i18n="fillerFoundNote">راجع الكلمات واختار اللي تحذفه. دوس ▶ تسمعها على التايم لاين.</div></div>
+      <div class="chips">
+        <button class="btn sm" onclick="deleteSelectedFillerWords()" data-i18n="deleteBtn">Delete</button>
+        <button class="btn sm cadr-undo-btn" onclick="undoLastCut('captionStatus')" title="Restore sequence before last delete" disabled data-i18n="undoBtn">Undo</button>
+      </div>
+    </div>
+    <label class="check" style="margin-top:8px"><input id="selectAllFillerWords" type="checkbox" onchange="toggleAllFillerCheckboxes(this.checked)"><span data-i18n="selectAllLbl">Select all</span></label>
+    <div id="fillerWordsList" class="filler-list"></div>
+  </div>
+
+  <details class="log"><summary><span data-i18n="activityLog">Activity Log</span></summary><div id="captionStatus" class="status" dir="auto">Ready.</div></details>
+</div>
+
+<!-- ======================= STYLE (STICKY MONITOR + DROPDOWN + LIVE CONTROLS) ======================= -->
+<div id="style" class="tabpanel">
+
+  <!-- Custom MOGRT Dropdown Button + Built-in Visual MOGRT Preview -->
+  <div class="mogrt-dd-wrap" id="mogrtDropdownWrap">
+    <div class="mogrt-dd-bar">
+      <button type="button" class="mogrt-dd-trigger" id="mogrtDropdownBtn" onclick="cadrToggleMogrtDropdown(event)">
+        <div class="mogrt-dd-left">
+          <div class="mogrt-dd-mini-thumb" id="mogrtDdMiniThumb">MOGRT</div>
+          <div class="mogrt-dd-titles">
+            <span class="mogrt-dd-name" id="mogrtDdActiveName" dir="auto">اختار قالب MOGRT...</span>
+            <span class="mogrt-dd-sub" id="mogrtDdActiveSub" dir="auto">اضغط لفتح القائمة المنسدلة ومعاينة القوالب</span>
+          </div>
+        </div>
+        <span class="mogrt-dd-caret">▾</span>
+      </button>
+      <button class="btn sm accent-outline" type="button" onclick="cadrStyleAdd()" data-i18n="addStyleBtn" title="Add .mogrt file from computer">+ إضافة .mogrt</button>
+      <button id="styleDeleteBtn" class="btn sm" type="button" onclick="cadrStyleDeleteActive()" data-i18n="delStyleBtn" title="Delete selected .mogrt from list" style="color:#f87171;border-color:rgba(248,113,113,.3)">🗑 حذف</button>
+    </div>
+
+    <!-- Custom Dropdown Menu Panel (shows user MOGRTs with built-in visual preview) -->
+    <div class="mogrt-dd-menu" id="mogrtDropdownMenu"></div>
+
+
+
+    <!-- Hidden legacy elements kept for internal compatibility -->
+    <select id="styleSelect" style="display:none" onchange="cadrStyleSelectChange(this.value)"></select>
+    <div id="styleChips" style="display:none"></div>
+  </div>
+
+  <!-- Primary MOGRT Actions -->
+  <div class="card pad">
+    <div class="btn-col">
+      <button id="styledCaptionButton" class="btn primary" type="button" onclick="cadrRunStyledCaptions()" data-i18n="placeStyledBtn">Add Styled Captions to Timeline</button>
+      <div class="btn-row">
+        <button class="btn" type="button" onclick="cadrStyleRead()" title="Read parameters from selected or placed MOGRT clip" data-i18n="readTplBtn">Read Template</button>
+        <button id="applyStyleButton" class="btn accent-outline" type="button" onclick="cadrStyleApplyToTimeline()" data-i18n="applyStyleShortBtn">Apply Changes</button>
+        <button id="removeStyledButton" class="btn" type="button" style="flex:0 0 auto" onclick="cadrRemoveStyledCaptions()" title="Remove placed MOGRT captions from the last created track" data-i18n="removeStyledBtn">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Style Customization Controls (scrolls underneath the sticky monitor) -->
+  <div id="styleControls" style="display:flex;flex-direction:column;gap:10px"></div>
+
+  <div class="row" style="padding:0 2px">
+    <span class="card-note" data-i18n="styleCustomizeNote">أي تعديل في الفونت أو اللون أو الحجم أو المكان يظهر فورًا على الشاشة الثابتة فوق وأنت بتعمل سكرول.</span>
+    <button class="btn sm" type="button" style="flex:0 0 auto" onclick="cadrStyleResetOverrides()" data-i18n="resetBtn">Reset</button>
+  </div>
+
+  <details class="log"><summary><span data-i18n="activityLog">Activity Log</span></summary><div id="styleStatus" class="status" dir="auto">Ready.</div></details>
+</div>
+
+<!-- ======================= SETTINGS ======================= -->
+<div id="settings" class="tabpanel">
+
+  <div class="settings-head">
+    <span class="settings-head-title">
+      <svg class="ic"><use href="#i-settings"/></svg>
+      <span data-i18n="tabSettings">Settings</span>
+    </span>
+    <button class="btn sm" type="button" onclick="cadrCloseSettings()" data-i18n="backToToolsBtn">← Back</button>
+  </div>
+
+  <div class="card pad" id="updaterCard">
+    <div class="row" style="margin-bottom:8px">
+      <span class="card-title" data-i18n="updaterTitle">تحديثات البلاجن (Cloud Auto-Update)</span>
+      <span id="cadrCurrentVerBadge" class="chip on">v1.3.5</span>
+    </div>
+    <div class="btn-row" style="margin-top:4px">
+      <button id="checkUpdateBtn" class="btn primary" type="button" onclick="cadrCheckForUpdates(true)" data-i18n="checkUpdateBtn">↻ فحص التحديثات الآن</button>
+      <button id="installUpdateBtn" class="btn btn-srt-import" type="button" onclick="cadrPerformOneClickUpdate()" data-i18n="installUpdateBtn">⚡ تحديث البلاجن الآن</button>
+    </div>
+    <div id="cadrUpdateStatus" class="status" dir="auto">الإصدار الحالي v1.3.5 — البلاجن متصل بالسيرفر السحابي وجاهز للتحديث التلقائي.</div>
+  </div>
+
+  <div class="card pad" id="licenseCard">
+    <div class="row" style="margin-bottom:8px">
+      <span class="card-title" data-i18n="licenseTitle">License</span>
+      <span id="licenseBadge" class="chip">Checking...</span>
+    </div>
+    <div class="field">
+      <label for="cadrDeviceId" data-i18n="deviceIdLbl">Device ID</label>
+      <div class="inline">
+        <input id="cadrDeviceId" type="text" readonly dir="ltr" value="Loading...">
+        <button class="btn sm" type="button" onclick="cadrCopyDeviceId()" data-i18n="copyBtn">Copy</button>
+      </div>
+      <div class="field-hint" data-i18n="deviceIdHint">ابعت الـ Device ID ده للمُصنّع عشان يطلع لك License Key خاص بالجهاز.</div>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label for="cadrLicenseKey" data-i18n="licenseKeyLbl">License Key</label>
+      <textarea id="cadrLicenseKey" rows="3" dir="ltr" placeholder="CADR-LIC-1...."></textarea>
+    </div>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn primary" type="button" onclick="cadrActivateLicense()" data-i18n="activateBtn">Activate</button>
+      <button class="btn" type="button" onclick="cadrCheckLicense()" data-i18n="checkBtn">Check</button>
+    </div>
+    <div id="licenseStatus" class="status" aria-live="polite" dir="auto">Checking license...</div>
+  </div>
+
+  <div class="card pad">
+    <div class="card-title" style="margin-bottom:8px" data-i18n="appearanceTitle">Brand Appearance & Language</div>
+    <div class="field">
+      <label for="accentColor" data-i18n="accentColorLbl">Accent color</label>
+      <div class="inline">
+        <input id="accentColor" type="color" value="#FF6B35" aria-label="Accent color">
+        <select id="accentPreset" aria-label="Color preset">
+          <option value="#FF6B35">Cinema Orange (CADR Brand)</option>
+          <option value="#3ddc97">Mint</option>
+          <option value="#e8a33d">Amber</option>
+          <option value="#4f8cff">Blue</option>
+          <option value="#a879ff">Purple</option>
+          <option value="#f06b9a">Pink</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card pad">
+    <div class="row" style="margin-bottom:8px">
+      <span class="card-title">Gemini AI</span>
+      <span id="geminiKeyRetentionBadge" class="chip" style="font-size:10.5px">Checking...</span>
+    </div>
+    <div class="field">
+      <label for="geminiApiKey">Google Gemini API Key</label>
+      <div class="inline">
+        <input id="geminiApiKey" type="password" placeholder="AIza..." dir="ltr" autocomplete="off" spellcheck="false" oninput="cadrAutoRetainApiKey(this.value)" onchange="saveApiKeySetting('geminiApiKey')">
+        <button class="btn sm" type="button" onclick="cadrToggleApiKeyVisibility()" title="Show / Hide API Key" style="flex:0 0 auto;padding:5px 8px">👁</button>
+        <button class="btn sm accent-outline" type="button" onclick="saveApiKeySetting('geminiApiKey')" data-i18n="saveBtn" style="flex:0 0 auto">حفظ</button>
+      </div>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label for="geminiModel" data-i18n="modelLbl">Model</label>
+      <select id="geminiModel" onchange="setSetting('geminiModel', this.value)">
+        <option value="gemini-3.8-flash" selected>Gemini 3.8 Flash (Recommended)</option>
+        <option value="gemini-3.6-flash">Gemini 3.6 Flash</option>
+        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Fast)</option>
+      </select>
+    </div>
+    <div id="apiKeyStorageStatus" class="field-hint" aria-live="polite" dir="auto" style="margin-top:6px" data-i18n="apiKeyProtectedHint">المفتاح بيتحفظ مشفّر بحماية نظام التشغيل للمستخدم الحالي.</div>
+    <div class="help" dir="auto" style="margin-top:4px" data-i18n="apiKeyHelp">كل مستخدم بيستخدم مفتاح الـ API الخاص بيه. الطلبات بتتبعت مباشرةً لـ Google بمفتاحك.</div>
+  </div>
+
+  <details class="card">
+    <summary><span>FFmpeg</span></summary>
+    <div class="body">
+      <div class="card-note" dir="auto" data-i18n="ffmpegNote">CADR CUT بيحاول يلاقي FFmpeg المرفق أو المثبّت تلقائيًا.</div>
+      <div class="field" style="margin-top:6px">
+        <label for="ffmpegPath" data-i18n="execPathLbl">Executable path</label>
+        <input id="ffmpegPath" type="text" value="" placeholder="Auto-detecting..." dir="ltr">
+      </div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn sm" type="button" onclick="detectFFmpeg(true)" data-i18n="detectBtn">Detect</button>
+        <button class="btn sm" type="button" onclick="testFFmpeg()" data-i18n="testBtn">Test</button>
+      </div>
+      <div id="ffmpegStatus" class="status" dir="auto">Checking bundled and installed FFmpeg...</div>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary><span data-i18n="diagTitle">Diagnostics</span></summary>
+    <div class="body">
+      <div class="card-note" dir="auto" data-i18n="diagNote">لو في حاجة مش شغالة: اعمل العملية، دوس Run، وانسخ النتيجة وابعتها.</div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn sm" type="button" onclick="runDiagnostics()" data-i18n="runBtn">Run</button>
+        <button class="btn sm" type="button" onclick="copyDiagnostics()" data-i18n="copyBtn">Copy</button>
+      </div>
+      <div class="sep"></div>
+      <div class="card-note" dir="auto" data-i18n="probeNote">تجارب ستايل الكابشن: Probe بيقرا بس. Test MOGRT بيحط قالب واحد على التايم لاين عند المؤشر.</div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn sm" type="button" onclick="runCaptionProbe()">Probe captions</button>
+        <button class="btn sm" type="button" onclick="runMogrtProbe()">Test MOGRT...</button>
+      </div>
+      <textarea id="diagOutput" readonly rows="10" dir="ltr" style="font-size:11px;margin-top:6px" placeholder="..."></textarea>
+    </div>
+  </details>
+
+  <div class="footer" dir="ltr">
+    <div class="footer-brand">CADR STUDIO</div>
+    <div class="footer-tag">YOUR VISION. OUR FRAME.</div>
+  </div>
+</div>
+
+</div>
+
+<!-- ======================= PINNED PROGRESS BAR ======================= -->
+<div id="cadrBar" class="bar" role="status" aria-live="polite" dir="ltr">
+  <div id="cadrBars" class="wave"></div>
+  <div id="cadrText" class="textlines"><i></i><i></i><div class="last"><i></i><u></u></div></div>
+  <div id="cadrTyped" class="typed" dir="rtl"><span id="cadrTypedText"></span><span class="cur"></span></div>
+  <div class="barfoot">
+    <span id="cadrBarMsg" dir="auto">Ready</span>
+    <span class="bar-right">
+      <button id="cadrStopBtn" class="stop-btn" type="button" onclick="cadrRequestStop()" data-i18n="stopBtn">■ Stop</button>
+      <span id="cadrBarPct"></span>
+    </span>
+  </div>
+</div>
+
+<script src="CSInterface.js?v=6.0"></script>
+<script src="license.js?v=6.0"></script>
+<script src="main.js?v=6.0"></script>
+</body>
+</html>

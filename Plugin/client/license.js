@@ -1,18 +1,19 @@
-/* CADR CUT - Offline License & Tamper-Proof 3-Day Trial Runtime (v1.4)
+/* CADR CUT - Offline License & Tamper-Proof 3-Day Trial Runtime (v1.6)
+ * Guaranteed Multi-Premiere Version Sync (2020 - 2027+) on the same machine.
  * The plugin ships with PUBLIC KEY ONLY. Never put private_key.pem here.
  */
 (function () {
   "use strict";
 
   var STORAGE_KEY = "cadrLicenseV1";
-  var DEVICE_CACHE_KEY = "cadrDeviceIdCacheV2";
+  var DEVICE_CACHE_KEY = "cadrDeviceIdCacheV4";
   var TRIAL_STORAGE_KEY = "cadrTrialLedgerV1";
   var PRODUCT = "CADR_CUT";
   var FORMAT = "CADR-LIC-1";
   var TRIAL_DAYS = 3;
   var TRIAL_DURATION_MS = TRIAL_DAYS * 24 * 60 * 60 * 1000; /* 72 hours (3 full days) */
   var TRIAL_SECRET_SALT = "CADR-STUDIO-TRIAL-SEAL-2026-v1";
-  var REG_TRIAL_KEY = "HKCU\\Software\\Classes\\CLSID\\{8F9C4D2A-5B71-4E3A-9C1D-2A6E8B4F1026}";
+  var MACHINE_SEAL_SALT = "CADR-STUDIO-MACHINE-ANCHOR-2026-v1";
 
   var publicKeyPem =
 `-----BEGIN PUBLIC KEY-----
@@ -21,6 +22,10 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
 
   function node() {
     if (window.cep_node && typeof window.cep_node.require === "function") {
+      return window.cep_node;
+    }
+    if (typeof cep_node !== "undefined" && cep_node && typeof cep_node.require === "function") {
+      window.cep_node = cep_node;
       return window.cep_node;
     }
     var req = (typeof window.require === "function") ? window.require
@@ -34,6 +39,140 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
       return window.cep_node;
     }
     return null;
+  }
+
+  function normalizeSlashes(p) {
+    var s = String(p || "").replace(/^file:\/+/i, "").replace(/\\/g, "/");
+    if (/^\/[a-zA-Z]:/.test(s)) s = s.slice(1);
+    return s.replace(/\/+$/, "");
+  }
+
+  /* Return existing root directories on the user machine that NEVER require mkdirSync
+   * (works on Node 7/8 in Premiere 2020-2022 as well as Node 16+ in Premiere 2024-2027+!) */
+  function getExistingUserRootDirs() {
+    var dirs = [];
+    function addUnique(d) {
+      if (!d) return;
+      var clean = normalizeSlashes(d);
+      if (clean && dirs.indexOf(clean) === -1) dirs.push(clean);
+    }
+
+    try {
+      if (window.__adobe_cep__ && typeof window.__adobe_cep__.getSystemPath === "function") {
+        addUnique(window.__adobe_cep__.getSystemPath("userData"));
+        addUnique(window.__adobe_cep__.getSystemPath("extension"));
+      }
+    } catch (e1) {}
+
+    var n = node();
+    if (n) {
+      try {
+        var os = n.require("os");
+        var proc = n.process || (typeof process !== "undefined" ? process : {});
+        var env = proc.env || {};
+        var home = os.homedir ? os.homedir() : (env.USERPROFILE || env.HOME || "");
+        var appData = env.APPDATA || (home ? (home + "/AppData/Roaming") : "");
+        var localAppData = env.LOCALAPPDATA || (home ? (home + "/AppData/Local") : "");
+        var tmpDir = os.tmpdir ? os.tmpdir() : (env.TEMP || "");
+        addUnique(appData);
+        addUnique(localAppData);
+        addUnique(home);
+        addUnique(tmpDir);
+      } catch (e2) {}
+    }
+
+    return dirs;
+  }
+
+  function mkdirSafe(fs, dirPath) {
+    try {
+      if (fs.existsSync(dirPath)) return true;
+      var norm = normalizeSlashes(dirPath);
+      var parts = norm.split("/");
+      var cur = "";
+      for (var i = 0; i < parts.length; i++) {
+        if (!parts[i]) continue;
+        cur = cur ? (cur + "/" + parts[i]) : (norm.charAt(0) === "/" ? ("/" + parts[i]) : parts[i]);
+        if (/^[a-zA-Z]:$/.test(cur)) continue;
+        try {
+          if (!fs.existsSync(cur)) fs.mkdirSync(cur);
+        } catch (em) {}
+      }
+      return fs.existsSync(dirPath);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function readDiskFileAny(filePath) {
+    if (!filePath) return null;
+    var norm = normalizeSlashes(filePath);
+    try {
+      if (window.cep && window.cep.fs && typeof window.cep.fs.readFile === "function") {
+        var r = window.cep.fs.readFile(norm);
+        if (r && r.err === 0 && typeof r.data === "string" && r.data.trim()) {
+          return r.data;
+        }
+      }
+    } catch (e1) {}
+    var n = node();
+    if (n) {
+      try {
+        var fs = n.require("fs");
+        if (fs.existsSync(norm)) {
+          var txt = String(fs.readFileSync(norm, "utf8") || "");
+          if (txt.trim()) return txt;
+        }
+      } catch (e2) {}
+    }
+    return null;
+  }
+
+  function writeDiskFileAny(filePath, content) {
+    if (!filePath) return false;
+    var norm = normalizeSlashes(filePath);
+    var wrote = false;
+
+    try {
+      if (window.cep && window.cep.fs && typeof window.cep.fs.writeFile === "function") {
+        var lastSlash = norm.lastIndexOf("/");
+        if (lastSlash > 0 && typeof window.cep.fs.makedir === "function") {
+          try { window.cep.fs.makedir(norm.slice(0, lastSlash)); } catch (em) {}
+        }
+        var w = window.cep.fs.writeFile(norm, String(content));
+        if (w && w.err === 0) wrote = true;
+      }
+    } catch (e1) {}
+
+    var n = node();
+    if (n) {
+      try {
+        var fs = n.require("fs");
+        var pathMod = n.require("path");
+        var dir = pathMod.dirname(norm);
+        mkdirSafe(fs, dir);
+        fs.writeFileSync(norm, String(content), "utf8");
+        wrote = true;
+      } catch (e2) {}
+    }
+    return wrote;
+  }
+
+  function deleteDiskFileAny(filePath) {
+    if (!filePath) return;
+    var norm = normalizeSlashes(filePath);
+    try {
+      if (window.cep && window.cep.fs && typeof window.cep.fs.deleteFile === "function") {
+        window.cep.fs.deleteFile(norm);
+      }
+    } catch (e1) {}
+    var n = node();
+    if (n) {
+      try {
+        var fs = n.require("fs");
+        if (fs.existsSync(norm)) fs.unlinkSync(norm);
+      } catch (e2) {}
+    }
   }
 
   /* Pure-JS SHA-256 implementation */
@@ -150,75 +289,106 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
     return BufferCtor.from(b64, "base64");
   }
 
+  function getMachineHardwareSeal() {
+    var sysUserData = "";
+    try {
+      if (window.__adobe_cep__ && typeof window.__adobe_cep__.getSystemPath === "function") {
+        sysUserData = normalizeSlashes(window.__adobe_cep__.getSystemPath("userData") || "").toLowerCase();
+      }
+    } catch (e1) {}
+    var plat = String(navigator.platform || "OS").toLowerCase().slice(0, 3);
+    return sha256Utf8Hex([plat, sysUserData, MACHINE_SEAL_SALT].join("|")).slice(0, 32);
+  }
+
   var cachedDeviceId = "";
 
+  function getSharedDeviceIdFilePaths() {
+    var roots = getExistingUserRootDirs();
+    var out = [];
+    for (var i = 0; i < roots.length; i++) {
+      out.push(roots[i] + "/.cadr_studio_device_id");
+      out.push(roots[i] + "/CADR_STUDIO/.cadr_device_id");
+    }
+    return out;
+  }
+
+  function saveSharedDeviceIdToAll(devId) {
+    if (!devId || devId.indexOf("CADR-") !== 0) return;
+    cachedDeviceId = devId;
+    try { window.localStorage.setItem(DEVICE_CACHE_KEY, devId); } catch (e0) {}
+    try { window.localStorage.setItem("cadrDeviceIdCacheV3", devId); } catch (e1) {}
+    try { window.localStorage.setItem("cadrDeviceIdCacheV2", devId); } catch (e2) {}
+    var paths = getSharedDeviceIdFilePaths();
+    for (var i = 0; i < paths.length; i++) {
+      writeDiskFileAny(paths[i], devId);
+    }
+  }
+
   function getDeviceId() {
-    if (cachedDeviceId && cachedDeviceId.indexOf("CADR-") === 0) return cachedDeviceId;
+    /* 1. Check if an activated license_key.json on this machine already has a bound deviceId */
+    var storedLic = readStoredRaw();
+    if (storedLic && storedLic.deviceId && String(storedLic.deviceId).indexOf("CADR-") === 0) {
+      saveSharedDeviceIdToAll(String(storedLic.deviceId));
+      return String(storedLic.deviceId);
+    }
+
+    /* 2. Check shared disk files across all existing user directories */
+    var idFiles = getSharedDeviceIdFilePaths();
+    for (var i = 0; i < idFiles.length; i++) {
+      var rawDisk = readDiskFileAny(idFiles[i]);
+      if (rawDisk) {
+        var savedId = String(rawDisk).trim();
+        if (savedId.indexOf("CADR-") === 0 && savedId.length >= 20) {
+          if (cachedDeviceId !== savedId) {
+            saveSharedDeviceIdToAll(savedId);
+          }
+          return savedId;
+        }
+      }
+    }
+
+    /* 3. Check localStorage cache */
     try {
-      var fromStore = window.localStorage.getItem(DEVICE_CACHE_KEY);
+      var fromStore = window.localStorage.getItem(DEVICE_CACHE_KEY) ||
+                      window.localStorage.getItem("cadrDeviceIdCacheV3") ||
+                      window.localStorage.getItem("cadrDeviceIdCacheV2") ||
+                      window.localStorage.getItem("cadrDeviceIdCacheV1");
       if (fromStore && fromStore.indexOf("CADR-") === 0 && fromStore.length >= 20) {
-        cachedDeviceId = fromStore;
-        return cachedDeviceId;
+        saveSharedDeviceIdToAll(fromStore);
+        return fromStore;
       }
     } catch (e) {}
 
+    /* 4. Generate a fresh Premiere-version-independent Device ID and persist to all shared paths */
     var n = node();
     if (n) {
       try {
-        var fs = n.require("fs");
-        var path = n.require("path");
         var os = n.require("os");
         var proc = n.process || (typeof process !== "undefined" ? process : {});
-        var env = proc.env || {};
-        var home = os.homedir ? os.homedir() : (env.USERPROFILE || env.HOME || "");
-        var appData = env.APPDATA || (home ? path.join(home, "AppData", "Roaming") : "");
-        var idFile = appData ? path.join(appData, "CADR_STUDIO", ".cadr_device_id") : (home ? path.join(home, ".cadr_device_id") : "");
-
-        if (idFile && fs.existsSync(idFile)) {
-          var savedId = String(fs.readFileSync(idFile, "utf8") || "").trim();
-          if (savedId.indexOf("CADR-") === 0 && savedId.length >= 20) {
-            cachedDeviceId = savedId;
-            try { window.localStorage.setItem(DEVICE_CACHE_KEY, cachedDeviceId); } catch (e0) {}
-            return cachedDeviceId;
-          }
-        }
-
-        /* Pure in-memory OS fingerprint (NO spawnSync / reg.exe that crashes Premiere Pro 2026!) */
         var plat = proc.platform || (String(navigator.platform || "").indexOf("Win") === 0 ? "win32" : "darwin");
-        var cpuModel = (os.cpus && os.cpus().length) ? String(os.cpus()[0].model || "") : "";
+        var cpuModel = (os.cpus && os.cpus().length) ? String(os.cpus()[0].model || "").trim() : "";
         var userStr = "";
-        try { userStr = os.userInfo ? String(os.userInfo().username || "") : ""; } catch (eu) {}
+        try { userStr = os.userInfo ? String(os.userInfo().username || "").trim() : ""; } catch (eu) {}
         var raw = [plat, os.arch(), os.hostname(), cpuModel, userStr].join("|");
-        cachedDeviceId = "CADR-" + sha256Utf8Hex(raw).slice(0, 32);
-        try { window.localStorage.setItem(DEVICE_CACHE_KEY, cachedDeviceId); } catch (e2) {}
-        if (idFile) {
-          try {
-            var idDir = path.dirname(idFile);
-            if (!fs.existsSync(idDir)) fs.mkdirSync(idDir, { recursive: true });
-            fs.writeFileSync(idFile, cachedDeviceId, "utf8");
-          } catch (ew) {}
-        }
-        return cachedDeviceId;
+        var newId = "CADR-" + sha256Utf8Hex(raw).slice(0, 32);
+        saveSharedDeviceIdToAll(newId);
+        return newId;
       } catch (e3) {}
     }
 
     try {
-      var hostEnv = (window.__adobe_cep__ && window.__adobe_cep__.getHostEnvironment)
-        ? String(window.__adobe_cep__.getHostEnvironment())
-        : "";
       var sysPath = (window.__adobe_cep__ && window.__adobe_cep__.getSystemPath)
-        ? String(window.__adobe_cep__.getSystemPath("userData"))
+        ? normalizeSlashes(window.__adobe_cep__.getSystemPath("userData") || "")
         : "";
       var seed = [
         navigator.platform || "OS",
         navigator.hardwareConcurrency || 8,
         (window.screen ? (window.screen.width + "x" + window.screen.height) : ""),
-        sysPath,
-        hostEnv.slice(0, 120)
+        sysPath
       ].join("|");
-      cachedDeviceId = "CADR-" + sha256Utf8Hex(seed).slice(0, 32);
-      try { window.localStorage.setItem(DEVICE_CACHE_KEY, cachedDeviceId); } catch (e4) {}
-      return cachedDeviceId;
+      var fbId = "CADR-" + sha256Utf8Hex(seed).slice(0, 32);
+      saveSharedDeviceIdToAll(fbId);
+      return fbId;
     } catch (e5) {
       return "CADR-" + sha256Utf8Hex("CADR-DEFAULT-MACHINE").slice(0, 32);
     }
@@ -226,9 +396,6 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
 
   /* =====================================================================
    * UNINSTALL-PROOF 3-DAY FREE TRIAL LEDGER
-   * Stores signed firstSeen + lastSeen timestamps across multiple hidden
-   * system locations outside the plugin folder so deleting/reinstalling
-   * the plugin or clearing localStorage NEVER resets the 3-day trial!
    * ===================================================================== */
 
   function signTrialRecord(deviceId, firstSeen, lastSeen) {
@@ -240,14 +407,14 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
     return "CT1." + btoa(unescape(encodeURIComponent(json)));
   }
 
-  function decodeTrialRecord(raw, expectedDeviceId) {
+  function decodeTrialRecord(raw) {
     try {
       if (!raw || typeof raw !== "string") return null;
       var clean = raw.trim();
       if (clean.indexOf("CT1.") !== 0) return null;
       var json = decodeURIComponent(escape(atob(clean.slice(4))));
       var obj = JSON.parse(json);
-      if (!obj || obj.deviceId !== expectedDeviceId) return null;
+      if (!obj || !obj.deviceId) return null;
       var fs = Number(obj.firstSeen);
       var ls = Number(obj.lastSeen);
       if (!isFinite(fs) || !isFinite(ls) || fs <= 1700000000000) return null;
@@ -260,32 +427,13 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
   }
 
   function getTrialAnchorPaths() {
-    var n = node();
-    if (!n) return [];
-    try {
-      var path = n.require("path");
-      var os = n.require("os");
-      var proc = n.process || (typeof process !== "undefined" ? process : {});
-      var env = proc.env || {};
-      var home = os.homedir ? os.homedir() : (env.USERPROFILE || env.HOME || "");
-      var appData = env.APPDATA || (home ? path.join(home, "AppData", "Roaming") : "");
-      var localAppData = env.LOCALAPPDATA || (home ? path.join(home, "AppData", "Local") : "");
-      var paths = [];
-
-      if (appData) {
-        paths.push(path.join(appData, "Adobe", "Common", ".cadr_sys_anchor.dat"));
-        paths.push(path.join(appData, "CADR_STUDIO", ".cadr_trial_state.dat"));
-      }
-      if (localAppData) {
-        paths.push(path.join(localAppData, ".cadr_lic_anchor.dat"));
-      }
-      if (home) {
-        paths.push(path.join(home, ".cadr_studio_telemetry"));
-      }
-      return paths;
-    } catch (e) {
-      return [];
+    var roots = getExistingUserRootDirs();
+    var paths = [];
+    for (var i = 0; i < roots.length; i++) {
+      paths.push(roots[i] + "/.cadr_trial_state.dat");
+      paths.push(roots[i] + "/CADR_STUDIO/.cadr_trial_state.dat");
     }
+    return paths;
   }
 
   var cachedTrialRecord = null;
@@ -303,36 +451,23 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
 
     var candidates = [];
 
-    /* 1. Check localStorage */
     try {
       var lsRaw = window.localStorage.getItem(TRIAL_STORAGE_KEY);
-      var lsRec = decodeTrialRecord(lsRaw, deviceId);
+      var lsRec = decodeTrialRecord(lsRaw);
       if (lsRec) candidates.push(lsRec);
     } catch (e1) {}
 
-    /* 2. Check all hidden filesystem anchors */
-    var n = node();
     var anchorPaths = getTrialAnchorPaths();
-    if (n && anchorPaths.length) {
-      try {
-        var fs = n.require("fs");
-        for (var i = 0; i < anchorPaths.length; i++) {
-          try {
-            if (fs.existsSync(anchorPaths[i])) {
-              var txt = fs.readFileSync(anchorPaths[i], "utf8");
-              var fRec = decodeTrialRecord(txt, deviceId);
-              if (fRec) candidates.push(fRec);
-            }
-          } catch (ef) {}
-        }
-      } catch (e2) {}
+    for (var i = 0; i < anchorPaths.length; i++) {
+      var txt = readDiskFileAny(anchorPaths[i]);
+      if (txt) {
+        var fRec = decodeTrialRecord(txt);
+        if (fRec) candidates.push(fRec);
+      }
     }
-
-    /* All 4 hidden filesystem anchors checked in-memory without spawnSync */
 
     var earliestFirstSeen = now;
     var latestLastSeen = now;
-    var isNewTrial = (candidates.length === 0);
 
     for (var c = 0; c < candidates.length; c++) {
       if (candidates[c].firstSeen < earliestFirstSeen) {
@@ -356,29 +491,13 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
 
     var encoded = encodeTrialRecord(canonical);
 
-    /* Persist back to localStorage */
     try {
       window.localStorage.setItem(TRIAL_STORAGE_KEY, encoded);
     } catch (e4) {}
 
-    /* Persist back to all hidden filesystem anchors */
-    if (n && anchorPaths.length) {
-      try {
-        var fsWrite = n.require("fs");
-        var pathMod = n.require("path");
-        for (var w = 0; w < anchorPaths.length; w++) {
-          try {
-            var dir = pathMod.dirname(anchorPaths[w]);
-            if (!fsWrite.existsSync(dir)) {
-              fsWrite.mkdirSync(dir, { recursive: true });
-            }
-            fsWrite.writeFileSync(anchorPaths[w], encoded, "utf8");
-          } catch (ew) {}
-        }
-      } catch (e5) {}
+    for (var w = 0; w < anchorPaths.length; w++) {
+      writeDiskFileAny(anchorPaths[w], encoded);
     }
-
-
 
     return canonical;
   }
@@ -386,7 +505,6 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
   function evaluateTrialStatus(deviceId) {
     var rec = loadAndSyncTrialState(deviceId);
     var now = Date.now();
-    /* Anti-clock-rollback: if system clock was rolled back behind lastSeen, use lastSeen */
     var effectiveNow = Math.max(now, rec.lastSeen);
     var elapsed = Math.max(0, effectiveNow - rec.firstSeen);
     var remainingMs = TRIAL_DURATION_MS - elapsed;
@@ -432,72 +550,78 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
   }
 
   /* =====================================================================
-   * FULL LICENSE STORAGE (Also backed up to persistent disk config!)
+   * FULL LICENSE STORAGE (Shared across ALL Premiere Pro versions on PC)
    * ===================================================================== */
 
-  function getPersistentLicenseFilePath() {
-    var n = node();
-    if (!n) return "";
-    try {
-      var path = n.require("path");
-      var os = n.require("os");
-      var proc = n.process || (typeof process !== "undefined" ? process : {});
-      var env = proc.env || {};
-      var home = os.homedir ? os.homedir() : (env.USERPROFILE || env.HOME || "");
-      var appData = env.APPDATA || (home ? path.join(home, "AppData", "Roaming") : "");
-      if (appData) return path.join(appData, "CADR_STUDIO", "license_key.json");
-      if (home) return path.join(home, ".cadr_license_key.json");
-    } catch (e) {}
-    return "";
+  function getPersistentLicenseFilePaths() {
+    var roots = getExistingUserRootDirs();
+    var out = [];
+    for (var i = 0; i < roots.length; i++) {
+      out.push(roots[i] + "/.cadr_studio_license.json");
+      out.push(roots[i] + "/CADR_STUDIO/license_key.json");
+    }
+    return out;
   }
 
-  function readStored() {
+  function readStoredRaw() {
+    var diskPaths = getPersistentLicenseFilePaths();
+    for (var i = 0; i < diskPaths.length; i++) {
+      var rawDisk = readDiskFileAny(diskPaths[i]);
+      if (rawDisk) {
+        try {
+          var diskParsed = JSON.parse(rawDisk);
+          if (diskParsed && diskParsed.key) {
+            return diskParsed;
+          }
+        } catch (e1) {}
+      }
+    }
+
     try {
       var raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
         if (parsed && parsed.key) return parsed;
       }
-    } catch (e) {}
+    } catch (e2) {}
 
-    /* Fallback to persistent disk file if localStorage was cleared */
-    var n = node();
-    var diskPath = getPersistentLicenseFilePath();
-    if (n && diskPath) {
-      try {
-        var fs = n.require("fs");
-        if (fs.existsSync(diskPath)) {
-          var diskParsed = JSON.parse(fs.readFileSync(diskPath, "utf8"));
-          if (diskParsed && diskParsed.key) {
-            try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(diskParsed)); } catch (e2) {}
-            return diskParsed;
-          }
-        }
-      } catch (e3) {}
-    }
     return null;
   }
 
-  function writeStored(key) {
-    var record = { key: key, savedAt: new Date().toISOString() };
+  function readStored() {
+    var rec = readStoredRaw();
+    if (rec && rec.key) {
+      try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(rec)); } catch (e) {}
+    }
+    return rec;
+  }
+
+  function writeStored(key, boundDeviceId) {
+    var record = {
+      key: String(key).trim(),
+      deviceId: boundDeviceId || getDeviceId(),
+      machineSeal: getMachineHardwareSeal(),
+      savedAt: new Date().toISOString()
+    };
+    var json = JSON.stringify(record);
     var savedAny = false;
+
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
+      window.localStorage.setItem(STORAGE_KEY, json);
       savedAny = true;
     } catch (e) {}
 
-    var n = node();
-    var diskPath = getPersistentLicenseFilePath();
-    if (n && diskPath) {
-      try {
-        var fs = n.require("fs");
-        var path = n.require("path");
-        var dir = path.dirname(diskPath);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(diskPath, JSON.stringify(record), "utf8");
+    var diskPaths = getPersistentLicenseFilePaths();
+    for (var i = 0; i < diskPaths.length; i++) {
+      if (writeDiskFileAny(diskPaths[i], json)) {
         savedAny = true;
-      } catch (e2) {}
+      }
     }
+
+    if (boundDeviceId) {
+      saveSharedDeviceIdToAll(boundDeviceId);
+    }
+
     return savedAny;
   }
 
@@ -514,18 +638,7 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
     }
   }
 
-  function verifyKey(input) {
-    var parsed = parseKey(input);
-    if (!parsed.ok) return parsed;
-    var p = parsed.payload;
-    if (!p || p.product !== PRODUCT) return { ok: false, error: "الترخيص ليس خاصًا بـ CADR CUT." };
-    if (!p.licenseId || !p.deviceId || !p.issuedAt) return { ok: false, error: "بيانات الترخيص ناقصة." };
-
-    var deviceId = getDeviceId();
-    if (String(p.deviceId) !== String(deviceId)) {
-      return { ok: false, error: "الترخيص مرتبط بجهاز آخر.", deviceId: deviceId, payload: p };
-    }
-
+  function verifySignatureOnly(parsed) {
     var validSignature = false;
     var n = node();
     if (n) {
@@ -542,45 +655,65 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApANhrmguFuiFHk34Rr06gxcP2BepXmF48hBu
     } else {
       validSignature = verifyRsaSha256PureJs(parsed.payloadB64, parsed.signatureB64);
     }
+    return validSignature;
+  }
 
-    if (!validSignature) {
-      return { ok: false, error: "التوقيع غير صالح أو License Key تم تعديله.", deviceId: deviceId, payload: p };
+  function verifyKey(input) {
+    var parsed = parseKey(input);
+    if (!parsed.ok) return parsed;
+    var p = parsed.payload;
+    if (!p || p.product !== PRODUCT) return { ok: false, error: "الترخيص ليس خاصًا بـ CADR CUT." };
+    if (!p.licenseId || !p.deviceId || !p.issuedAt) return { ok: false, error: "بيانات الترخيص ناقصة." };
+
+    /* 1. Verify RSA-2048 cryptographic signature first */
+    if (!verifySignatureOnly(parsed)) {
+      return { ok: false, error: "التوقيع غير صالح أو License Key تم تعديله.", deviceId: getDeviceId(), payload: p };
     }
 
+    /* 2. Check expiration date */
     var now = Date.now();
     if (p.expiresAt !== null && p.expiresAt !== undefined && p.expiresAt !== "") {
       var expiry = Date.parse(p.expiresAt);
-      if (!isFinite(expiry)) return { ok: false, error: "تاريخ انتهاء الترخيص غير صالح.", deviceId: deviceId, payload: p };
-      if (now > expiry) return { ok: false, error: "الترخيص منتهي الصلاحية.", deviceId: deviceId, payload: p };
+      if (!isFinite(expiry)) return { ok: false, error: "تاريخ انتهاء الترخيص غير صالح.", deviceId: getDeviceId(), payload: p };
+      if (now > expiry) return { ok: false, error: "الترخيص منتهي الصلاحية.", deviceId: getDeviceId(), payload: p };
     }
 
-    return { ok: true, isTrial: false, payload: p, deviceId: deviceId };
+    /* 3. Unify Device ID across all Premiere Pro versions (2020-2027+) on this PC */
+    var canonicalId = String(p.deviceId);
+    saveSharedDeviceIdToAll(canonicalId);
+
+    return { ok: true, isTrial: false, payload: p, deviceId: canonicalId };
   }
 
   function current() {
-    var deviceId = getDeviceId();
     var stored = readStored();
     if (stored && stored.key) {
       var result = verifyKey(stored.key);
-      if (result.ok) return result;
+      if (result.ok) {
+        writeStored(stored.key, result.deviceId);
+        return result;
+      }
     }
-    /* No active paid license key -> evaluate the 3-day uninstall-proof free trial */
+    var deviceId = getDeviceId();
     return evaluateTrialStatus(deviceId);
   }
 
   function activate(key) {
     var result = verifyKey(key);
     if (!result.ok) return result;
-    if (!writeStored(String(key).trim())) return { ok: false, error: "تعذر حفظ الترخيص على هذا الجهاز.", deviceId: result.deviceId };
+    if (!writeStored(String(key).trim(), result.deviceId)) {
+      return { ok: false, error: "تعذر حفظ الترخيص على هذا الجهاز.", deviceId: result.deviceId };
+    }
+    var devInput = document.getElementById("cadrDeviceId");
+    if (devInput) devInput.value = result.deviceId;
     return result;
   }
 
   function deactivate() {
     try { window.localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-    var n = node();
-    var diskPath = getPersistentLicenseFilePath();
-    if (n && diskPath) {
-      try { n.require("fs").unlinkSync(diskPath); } catch (e2) {}
+    var diskPaths = getPersistentLicenseFilePaths();
+    for (var i = 0; i < diskPaths.length; i++) {
+      deleteDiskFileAny(diskPaths[i]);
     }
     return true;
   }
