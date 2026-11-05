@@ -716,6 +716,353 @@ var silenceAnalysisCache = {};
 
 function cacheKeyFor(clip, silence, noiseThreshold) {
     var modified = "";
+              m = parts[p].match(/^A=(\d+)$/);
+
+                            if (m) {
+                                audioAdded += parseInt(m[1], 10);
+                            }
+                        }
+
+                        if (parts[0] !== "OK") {
+                            problems.push(
+                                times[index].toFixed(2) + "s: " +
+                                text.replace(/^ERR;/, "")
+                            );
+                        }
+
+                        index++;
+
+                        setProgress(
+                            "cutProgress",
+                            Math.round((index / times.length) * 100)
+                        );
+
+                        statusEl.textContent =
+                            head + "\n\nSmooth Cuts... " +
+                            index + " / " + times.length;
+
+                        setTimeout(next, CADR_CUT_PAUSE_MS);
+                    }
+                );
+            }
+
+            next();
+        }
+    );
+}
+
+
+/* =========================================================
+   BACKUP BEFORE CUTTING + UNDO
+   ---------------------------------------------------------
+   Before every cut we clone the sequence. UNDO CUT swaps the
+   clone back in. The cut version is never deleted: it stays in
+   the project as "<name> (CUT)".
+   ========================================================= */
+
+var cadrLastBackup = null;
+var cadrBackupCaptionSnapshot = null;
+
+/* The caption/filler-word list in the panel is tied to the timeline as it
+   was when the backup was taken, so UNDO restores that list too. */
+function cadrTakeCaptionSnapshot() {
+    try {
+        return JSON.stringify({
+            lines: pendingCaptionLines,
+            words: pendingCaptionWords,
+            fillers: fillerWordsList
+        });
+    } catch (e) {
+        return null;
+    }
+}
+
+function cadrResetCaptionState() {
+    pendingCaptionSrt = null;
+    pendingCaptionLines = [];
+    pendingCaptionWords = [];
+    fillerWordsList = [];
+
+    var box = document.getElementById("fillerWordsBox");
+    if (box) {
+        box.style.display = "none";
+    }
+
+    var preview = document.getElementById("captionPreview");
+    if (preview) {
+        preview.value = "";
+    }
+
+    cadrTrReset();
+}
+
+function cadrRestoreCaptionSnapshot(snapshot) {
+    try {
+        var data = JSON.parse(snapshot);
+
+        pendingCaptionLines = data.lines || [];
+        pendingCaptionWords = data.words || [];
+        fillerWordsList = data.fillers || [];
+
+        rebuildCaptionPreview();
+
+        if (fillerWordsList.length > 0) {
+            renderFillerWords();
+        } else {
+            var box = document.getElementById("fillerWordsBox");
+            if (box) {
+                box.style.display = "none";
+            }
+        }
+
+        return true;
+
+    } catch (e) {
+        return false;
+    }
+}
+
+(function loadSavedBackupInfo() {
+    try {
+        var raw = window.localStorage.getItem("cadrLastBackup");
+        if (raw) {
+            cadrLastBackup = JSON.parse(raw);
+        }
+    } catch (e) {
+        cadrLastBackup = null;
+    }
+})();
+
+function cadrSaveBackupInfo(info) {
+    cadrLastBackup = info;
+    try {
+        if (info) {
+            window.localStorage.setItem("cadrLastBackup", JSON.stringify(info));
+        } else {
+            window.localStorage.removeItem("cadrLastBackup");
+        }
+    } catch (e) {}
+}
+
+function cadrUpdateUndoButtons(enabled) {
+    var buttons = document.querySelectorAll(".cadr-undo-btn");
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = !enabled;
+    }
+}
+
+/* Enable the undo buttons only if the saved backup still exists
+   in the CURRENT project. */
+function cadrRefreshUndoState() {
+
+    if (!cadrLastBackup || !cadrLastBackup.backupId) {
+        cadrUpdateUndoButtons(false);
+        return;
+    }
+
+    if (!window.__adobe_cep__) {
+        cadrUpdateUndoButtons(false);
+        return;
+    }
+    csInterface.evalScript(
+        "cadrBackupExists('" + cadrLastBackup.backupId + "')",
+        function (response) {
+            if (response === "1") {
+                cadrUpdateUndoButtons(true);
+            } else {
+                cadrSaveBackupInfo(null);
+                cadrUpdateUndoButtons(false);
+            }
+        }
+    );
+}
+
+/* Creates the backup, then makes sure the ORIGINAL sequence is
+   the active one again (so we never cut the backup by mistake).
+   onReady(true)  => safe to cut
+   onReady(false) => do not cut                                   */
+function cadrBackupThen(statusEl, onReady) {
+
+    /* The flag expires after 30 minutes so a crashed run can never lock
+       the buttons until Premiere is restarted. */
+    if (
+        cadrCutBusy &&
+        Date.now() - cadrCutBusySince < 30 * 60 * 1000
+    ) {
+        statusEl.textContent = "في عملية قص شغالة دلوقتي، استنى لحد ما تخلص.";
+        onReady(false);
+        return;
+    }
+
+    cadrCutBusy = true;
+    cadrCutBusySince = Date.now();
+
+    var captionSnapshot = cadrTakeCaptionSnapshot();
+
+    statusEl.textContent =
+        "بيعمل نسخة احتياطية من السيكوينس (عشان تقدر ترجع)...";
+
+    csInterface.evalScript("cadrCreateBackup()", function (response) {
+
+        var info = null;
+
+        try {
+            info = JSON.parse(response);
+        } catch (e) {
+            info = null;
+        }
+
+        if (!info || !info.backupId) {
+
+            var reason =
+                response === "CLONE_UNAVAILABLE"
+                    ? "نسخة بريمير دي مش بتسمح بعمل نسخة من السيكوينس من السكريبت."
+                    : "مقدرش يعمل نسخة احتياطية (" + response + ").";
+
+            var goOn = window.confirm(
+                reason +
+                "\n\nلو كملت، زرار الرجوع مش هيشتغل (هتبقى محتاج Ctrl+Z).\n\nتكمل القص من غير نسخة احتياطية؟"
+            );
+
+            if (!goOn) {
+                cadrCutBusy = false;
+                statusEl.textContent = "اتلغى القص. محصلش أي تغيير.";
+                onReady(false);
+                return;
+            }
+
+            cadrSaveBackupInfo(null);
+            cadrBackupCaptionSnapshot = null;
+            cadrUpdateUndoButtons(false);
+            onReady(true);
+            return;
+        }
+
+        cadrSaveBackupInfo(info);
+        cadrBackupCaptionSnapshot = captionSnapshot;
+
+        /* Give Premiere a moment to switch back to the original
+           sequence, then verify it really is the active one. */
+        function verify(attempt) {
+
+            csInterface.evalScript("cadrActiveSequenceId()", function (activeId) {
+
+                if (activeId === info.originalId) {
+                    cadrUpdateUndoButtons(true);
+                    onReady(true);
+                    return;
+                }
+
+                if (attempt >= 3) {
+                    cadrCutBusy = false;
+                    statusEl.textContent =
+                        "اتعملت النسخة الاحتياطية، بس بريمير مرجعش للسيكوينس الأصلي.\n\n" +
+                        "افتح السيكوينس الأصلي بإيدك (\"" + info.originalName + "\") وجرب تاني.\n" +
+                        "محصلش أي قص.";
+                    cadrUpdateUndoButtons(true);
+                    onReady(false);
+                    return;
+                }
+
+                csInterface.evalScript(
+                    "cadrActivateSequence('" + info.originalId + "')",
+                    function () {
+                        setTimeout(function () {
+                            verify(attempt + 1);
+                        }, 700);
+                    }
+                );
+            });
+        }
+
+        setTimeout(function () {
+            verify(0);
+        }, 700);
+    });
+}
+
+function undoLastCut(statusId) {
+
+    var status =
+        document.getElementById(statusId || "cutStatus");
+
+    if (cadrCutBusy) {
+        status.textContent = "استنى لحد ما العملية الشغالة تخلص وبعدين دوس Undo.";
+        return;
+    }
+
+    if (!cadrLastBackup || !cadrLastBackup.backupId) {
+        status.textContent = "مفيش قصة تتراجع عنها.";
+        cadrUpdateUndoButtons(false);
+        return;
+    }
+
+    var ok = window.confirm(
+        "هترجع السيكوينس زي ما كان قبل آخر قص.\n\n" +
+        "النسخة المقصوصة مش هتتمسح، هتفضل في المشروع باسم \"" +
+        cadrLastBackup.originalName + " (CUT)\".\n\nتكمل؟"
+    );
+
+    if (!ok) {
+        return;
+    }
+
+    cadrUpdateUndoButtons(false);
+    status.textContent = "بيرجّع السيكوينس...";
+
+    csInterface.evalScript(
+        "cadrRestoreBackup('" +
+        cadrLastBackup.originalId + "','" +
+        cadrLastBackup.backupId + "','" +
+        escapeExtendScriptString(cadrLastBackup.originalName) + "')",
+        function (response) {
+
+            if (response === "RESTORED") {
+
+                status.textContent =
+                    "تم الرجوع ✅\n\n" +
+                    "السيكوينس رجع زي ما كان. النسخة المقصوصة لسه في المشروع باسم \"" +
+                    cadrLastBackup.originalName + " (CUT)\".";
+
+                cadrSaveBackupInfo(null);
+
+                /* Bring back the caption / filler-word list as it was. */
+                if (
+                    !cadrBackupCaptionSnapshot ||
+                    !cadrRestoreCaptionSnapshot(cadrBackupCaptionSnapshot)
+                ) {
+                    cadrResetCaptionState();
+                }
+
+                cadrBackupCaptionSnapshot = null;
+
+                refreshSelection();
+                return;
+            }
+
+            if (response === "BACKUP_MISSING") {
+                status.textContent =
+                    "النسخة الاحتياطية مش موجودة في المشروع (يمكن اتمسحت).";
+                cadrSaveBackupInfo(null);
+                cadrUpdateUndoButtons(false);
+                return;
+            }
+
+            status.textContent = "فشل الرجوع: " + response;
+            cadrUpdateUndoButtons(true);
+        }
+    );
+}
+
+
+/* =========================================================
+   ANALYSIS CACHE
+   ========================================================= */
+
+var silenceAnalysisCache = {};
+
+function cacheKeyFor(clip, silence, noiseThreshold) {
+    var modified = "";
     try {
         var fs = window.cep_node.require("fs");
         var stat = fs.statSync(clip.path);
