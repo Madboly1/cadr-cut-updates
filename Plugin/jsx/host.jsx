@@ -125,8 +125,10 @@ function cadrSafeActiveSequence() {
 var cadrQeAlreadyEnabled = false;
 function cadrEnsureQE() {
     if (!cadrQeAlreadyEnabled) {
-        cadrEnsureQE();
-        cadrQeAlreadyEnabled = true;
+        try {
+            app.enableQE();
+            cadrQeAlreadyEnabled = true;
+        } catch (e) {}
     }
 }
 

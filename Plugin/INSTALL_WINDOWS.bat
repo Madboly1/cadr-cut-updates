@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-title CADR CUT v1.3.6 — One-Click Installer (Premiere Pro 2020 - 2027+)
+title CADR CUT v1.3.7 — One-Click Installer (Premiere Pro 2020 - 2027+)
 color 0F
 
 net session >nul 2>&1
@@ -12,7 +12,7 @@ if %errorlevel% neq 0 (
 
 cls
 echo ====================================================================
-echo                 CADR STUDIO  ^|  CADR CUT v1.3.6
+echo                 CADR STUDIO  ^|  CADR CUT v1.3.7
 echo          Compatible with Premiere Pro 2020 - 2026 / 2027+
 echo                    YOUR VISION. OUR FRAME.
 echo ====================================================================
@@ -60,7 +60,7 @@ for %%D in ("%CEP_X86%" "%CEP_X64%" "%CEP_USR%") do (
 echo       Done.
 echo.
 
-echo [4/4] Installing CADR CUT v1.3.6 to %SYS_CEP%...
+echo [4/4] Installing CADR CUT v1.3.7 to %SYS_CEP%...
 mkdir "%SYS_CEP%" >nul 2>&1
 xcopy "%SRC_DIR%\client" "%SYS_CEP%\client\" /E /I /Y /Q >nul
 xcopy "%SRC_DIR%\CSXS" "%SYS_CEP%\CSXS\" /E /I /Y /Q >nul
@@ -79,7 +79,7 @@ echo       Installed cleanly to: %SYS_CEP%
 echo.
 
 echo ====================================================================
-echo  [SUCCESS] CADR CUT v1.3.6 has been installed! (2020 - 2027+)
+echo  [SUCCESS] CADR CUT v1.3.7 has been installed! (2020 - 2027+)
 echo  Restart Adobe Premiere Pro -^> Window -^> Extensions -^> CADR CUT
 echo ====================================================================
 echo.

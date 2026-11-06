@@ -2,11 +2,11 @@
 ; CADR CUT — Official Windows Installer Script (Inno Setup 6)
 ; Brand: CADR STUDIO ("YOUR VISION. OUR FRAME.")
 ; Compatible with Adobe Premiere Pro 2020 through 2026, 2027 & Newer
-; Supports In-App One-Click GitHub OTA Auto-Updates (v1.3.6+)
+; Supports In-App One-Click GitHub OTA Auto-Updates (v1.3.7+)
 ; =====================================================================
 
 #define MyAppName "CADR CUT"
-#define MyAppVersion "1.3.6"
+#define MyAppVersion "1.3.7"
 #define MyAppPublisher "CADR STUDIO"
 #define MyAppURL "https://cadrstudio.com"
 #define ExtensionFolderName "CADR_CUT"

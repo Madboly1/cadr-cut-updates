@@ -16546,7 +16546,7 @@ cadrBuildStudioStyleControls();
    jsx/host.jsx in-place with 1 click without closing Premiere!
    ========================================================= */
 
-var CADR_CURRENT_VERSION = "1.3.6";
+var CADR_CURRENT_VERSION = "1.3.7";
 var CADR_UPDATE_REPO_KEY = "cadrGithubUpdateRepoV1";
 var CADR_DEFAULT_GITHUB_REPO = "Madboly1/cadr-cut-updates";
 var cadrLatestRemoteUpdate = null;
