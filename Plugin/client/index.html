@@ -2724,22 +2724,14 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 
   <div class="card pad" id="updaterCard">
     <div class="row" style="margin-bottom:8px">
-      <span class="card-title" data-i18n="updaterTitle">التحديث التلقائي (Cloud Auto-Update)</span>
-      <span id="cadrCurrentVerBadge" class="chip on">v1.3.2</span>
+      <span class="card-title" data-i18n="updaterTitle">تحديثات البلاجن (Cloud Auto-Update)</span>
+      <span id="cadrCurrentVerBadge" class="chip on">v1.3.6</span>
     </div>
-    <div class="field">
-      <label for="cadrUpdateRepoInput" data-i18n="updateRepoLbl">GitHub Repository (username/repo)</label>
-      <div class="inline">
-        <input id="cadrUpdateRepoInput" type="text" dir="ltr" value="Madboly1/cadr-cut-updates" placeholder="Madboly1/cadr-cut-updates" onchange="cadrSaveUpdateRepo(this.value)">
-        <button class="btn sm" type="button" onclick="cadrSaveUpdateRepo(document.getElementById('cadrUpdateRepoInput').value)" data-i18n="saveBtn">حفظ</button>
-      </div>
-      <div class="field-hint" data-i18n="updateRepoHint">اكتب اسم حسابك واسم المستودع على GitHub (مربوط افتراضيًا بـ <b>Madboly1/cadr-cut-updates</b>) عشان البلاجن يسحب منه أي تحديث ترفعه تلقائيًا.</div>
-    </div>
-    <div class="btn-row" style="margin-top:8px">
+    <div class="btn-row" style="margin-top:4px">
       <button id="checkUpdateBtn" class="btn primary" type="button" onclick="cadrCheckForUpdates(true)" data-i18n="checkUpdateBtn">↻ فحص التحديثات الآن</button>
-      <button id="installUpdateBtn" class="btn btn-srt-import" type="button" style="display:none" onclick="cadrPerformOneClickUpdate()" data-i18n="installUpdateBtn">⚡ تثبيت التحديث الجديد</button>
+      <button id="installUpdateBtn" class="btn btn-srt-import" type="button" onclick="cadrPerformOneClickUpdate()" data-i18n="installUpdateBtn">⚡ تحديث البلاجن الآن</button>
     </div>
-    <div id="cadrUpdateStatus" class="status" dir="auto">الإصدار الحالي v1.3.2 — جاهز لفحص التحديثات السحابية.</div>
+    <div id="cadrUpdateStatus" class="status" dir="auto">الإصدار الحالي v1.3.6 — البلاجن متصل بالسيرفر السحابي وجاهز للتحديث التلقائي.</div>
   </div>
 
   <div class="card pad" id="licenseCard">
@@ -2799,12 +2791,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
     </div>
     <div class="field" style="margin-top:8px">
       <label for="geminiModel" data-i18n="modelLbl">Model</label>
-      <select id="geminiModel">
-        <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended)</option>
-        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
-        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-        <option value="gemini-3.8-flash">Gemini 3.8 Flash</option>
-        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite</option>
+      <select id="geminiModel" onchange="setSetting('geminiModel', this.value)">
+        <option value="gemini-3.8-flash" selected>Gemini 3.8 Flash (Recommended)</option>
+        <option value="gemini-3.6-flash">Gemini 3.6 Flash</option>
+        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Fast)</option>
       </select>
     </div>
     <div id="apiKeyStorageStatus" class="field-hint" aria-live="polite" dir="auto" style="margin-top:6px" data-i18n="apiKeyProtectedHint">المفتاح بيتحفظ مشفّر بحماية نظام التشغيل للمستخدم الحالي.</div>
@@ -2867,8 +2857,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
   </div>
 </div>
 
-<script src="CSInterface.js?v=5.8"></script>
-<script src="license.js?v=5.8"></script>
-<script src="main.js?v=5.8"></script>
+<script src="CSInterface.js?v=6.0"></script>
+<script src="license.js?v=6.0"></script>
+<script src="main.js?v=6.0"></script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 {
-  "version": "1.3.2",
+  "version": "1.3.6",
   "repo": "Madboly1/cadr-cut-updates",
-  "releaseDate": "2026-11-02",
-  "notesAr": "إضافة التحديث السحابي التلقائي المباشر من GitHub (Madboly1/cadr-cut-updates) ودعم Premiere 2020-2027+",
-  "notesEn": "Added 1-Click GitHub Cloud OTA Auto-Updater (Madboly1/cadr-cut-updates) and Premiere 2020-2027+ stability fixes",
+  "releaseDate": "2026-11-06",
+  "notesAr": "حماية ذكية ضد الملفات غير المكتملة أثناء التحديث + تفعيل موحّد لجميع نسخ بريمير",
+  "notesEn": "Anti-brick integrity validation for OTA updates + unified license across all Premiere versions",
   "files": [
     "Plugin/client/index.html",
     "Plugin/client/main.js",
