@@ -1,9 +1,9 @@
 {
-  "version": "1.3.7",
+  "version": "1.3.8",
   "repo": "Madboly1/cadr-cut-updates",
-  "releaseDate": "2026-11-06",
-  "notesAr": "إصلاح خطأ QE Stack overrun في القطع التلقائي والتشخيص + حماية التحديث السحابي",
-  "notesEn": "Fixed QE Stack overrun in Auto Cut & Diagnostics + Safe OTA Update",
+  "releaseDate": "2026-11-20",
+  "notesAr": "إصلاح تطبيق الخطوط على قوالب الـ MOGRT (قراءة خطوط الجهاز الحقيقية بالـ PostScript Name ودعم مصفوفة fontEditValue في بريمير 2024+)",
+  "notesEn": "Fixed MOGRT font application (auto-scans real installed PC fonts with exact PostScript names and multi-run fontEditValue array support)",
   "files": [
     "Plugin/client/index.html",
     "Plugin/client/main.js",

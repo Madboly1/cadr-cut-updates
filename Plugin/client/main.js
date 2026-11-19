@@ -13352,32 +13352,38 @@ function cadrResolveFontFamily(fontPs) {
 function cadrGetCombinedVisualFonts() {
     cadrFontListLoad();
     var out = [];
-    var seen = {};
+    var seenPs = {};
 
-    for (var i = 0; i < CADR_STUDIO_VISUAL_FONTS.length; i++) {
-        var vf = CADR_STUDIO_VISUAL_FONTS[i];
-        seen[vf.ps.toLowerCase()] = true;
-        seen[vf.family.toLowerCase()] = true;
-        out.push(vf);
-    }
-
-    if (Array.isArray(cadrFontList)) {
+    /* 1. ALWAYS put REAL installed PC fonts (with exact binary PostScript nameID=6) FIRST!
+     *    Never deduplicate by family so Regular / SemiBold / Bold / Black all appear and apply! */
+    if (Array.isArray(cadrFontList) && cadrFontList.length > 0) {
         for (var j = 0; j < cadrFontList.length; j++) {
             var sf = cadrFontList[j];
             if (!sf || !sf.ps || !sf.family) continue;
             var keyPs = String(sf.ps).toLowerCase();
-            var keyFam = String(sf.family).toLowerCase();
-            if (seen[keyPs] || seen[keyFam]) continue;
-            seen[keyPs] = true;
-            seen[keyFam] = true;
+            if (seenPs[keyPs]) continue;
+            seenPs[keyPs] = true;
+            var sty = String(sf.style || "").trim();
             out.push({
-                ps: sf.ps,
-                family: sf.family,
-                label: sf.family + (sf.style ? (" — " + sf.style) : ""),
+                ps: String(sf.ps),
+                family: String(sf.family),
+                style: sty,
+                label: String(sf.family) + (sty ? (" — " + sty) : ""),
                 arabic: !!sf.arabic,
-                weight: /bold|black|heavy/i.test(sf.style || "") ? 700 : 600
+                installed: true,
+                weight: /black|heavy|extrabold/i.test(sty) ? 800 : (/bold|semibold/i.test(sty) ? 700 : 400)
             });
         }
+        return out;
+    }
+
+    /* 2. Fallback list ONLY before PC font scan finishes */
+    for (var i = 0; i < CADR_STUDIO_VISUAL_FONTS.length; i++) {
+        var vf = CADR_STUDIO_VISUAL_FONTS[i];
+        var kPs = String(vf.ps).toLowerCase();
+        if (seenPs[kPs]) continue;
+        seenPs[kPs] = true;
+        out.push(vf);
     }
     return out;
 }
@@ -15288,12 +15294,13 @@ cadrBuildStudioStyleControls = function () {
                 if (q && fn.label.toLowerCase().indexOf(q) === -1 && fn.family.toLowerCase().indexOf(q) === -1 && fn.ps.toLowerCase().indexOf(q) === -1) {
                     continue;
                 }
-                if (shownCount >= 70) break;
+                if (shownCount >= 150) break;
                 shownCount++;
 
-                var isSel = (fn.ps === curPs || fn.family === curFam);
+                var isSel = (fn.ps === curPs);
                 var row = document.createElement("div");
                 row.className = "vfont-item" + (isSel ? " active" : "");
+                row.title = "PostScript: " + fn.ps;
 
                 var sampleSpan = document.createElement("span");
                 sampleSpan.className = "vfont-sample";
@@ -15303,7 +15310,7 @@ cadrBuildStudioStyleControls = function () {
 
                 var metaSpan = document.createElement("span");
                 metaSpan.className = "vfont-meta";
-                metaSpan.textContent = (isSel ? "✓ " : "") + fn.family;
+                metaSpan.textContent = (isSel ? "✓ " : "") + (fn.label || fn.family);
 
                 row.appendChild(sampleSpan);
                 row.appendChild(metaSpan);
@@ -15354,6 +15361,15 @@ cadrBuildStudioStyleControls = function () {
             cadrFontDropdownOpen = !cadrFontDropdownOpen;
             fontDdBtn.classList.toggle("open", cadrFontDropdownOpen);
             fontDdPanel.classList.toggle("open", cadrFontDropdownOpen);
+            if (cadrFontDropdownOpen && (!cadrFontList || !cadrFontList.length) && !cadrFontScanning) {
+                refreshBtn.textContent = "...";
+                cadrFontScan(function (done, total) {
+                    refreshBtn.textContent = done + "/" + total;
+                }, function () {
+                    refreshBtn.textContent = isEn ? "↻ Scan PC" : "↻ فحص الجهاز";
+                    renderVisualFontRows();
+                });
+            }
         };
 
         search.oninput = function () {
@@ -16546,7 +16562,7 @@ cadrBuildStudioStyleControls();
    jsx/host.jsx in-place with 1 click without closing Premiere!
    ========================================================= */
 
-var CADR_CURRENT_VERSION = "1.3.7";
+var CADR_CURRENT_VERSION = "1.3.8";
 var CADR_UPDATE_REPO_KEY = "cadrGithubUpdateRepoV1";
 var CADR_DEFAULT_GITHUB_REPO = "Madboly1/cadr-cut-updates";
 var cadrLatestRemoteUpdate = null;

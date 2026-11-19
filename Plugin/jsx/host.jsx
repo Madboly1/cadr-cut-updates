@@ -2930,75 +2930,157 @@ function cadrFindMgtTextParam(comp) {
     return fallback;
 }
 
+function cadrFindAllMgtTextParams(comp) {
+    var indices = [];
+    for (var i = 0; i < comp.properties.numItems; i++) {
+        var prop = comp.properties[i];
+        var value;
+        try {
+            value = prop.getValue();
+        } catch (e1) {
+            continue;
+        }
+        if (
+            typeof value === "string" &&
+            value.charAt(0) === "{" &&
+            value.indexOf("textEditValue") !== -1
+        ) {
+            indices.push(i);
+        }
+    }
+    if (!indices.length) {
+        var fb = cadrFindMgtTextParam(comp);
+        if (fb >= 0) indices.push(fb);
+    }
+    return indices;
+}
+
+function cadrFillRunArray(existingArr, val, runCount) {
+    var n = runCount > 0 ? runCount : 1;
+    var out = [];
+    for (var i = 0; i < n; i++) {
+        out.push(val);
+    }
+    return out;
+}
+
 function cadrSetMgtText(comp, text, ov) {
-    var index = cadrFindMgtTextParam(comp);
-    if (index < 0) {
+    var indices = cadrFindAllMgtTextParams(comp);
+    if (!indices.length) {
         return "NO_TEXT_PARAM";
     }
 
-    var param = comp.properties[index];
-    var wantsFont = !!(ov && ov.font);
+    var wantsFont = !!(ov && ov.font && String(ov.font).replace(/^\s+|\s+$/g, ""));
     var wantsSize = !!(ov && ov.fontSize);
 
     if (text === null && !wantsFont && !wantsSize) {
         return "json";
     }
 
-    try {
-        var rawVal = String(param.getValue());
-        var parsed = JSON.parse(rawVal);
+    var primaryMode = "";
 
-        if (parsed && typeof parsed === "object") {
-            if (text !== null) {
-                parsed.textEditValue = String(text);
-                if (Object.prototype.toString.call(parsed.fontTextRunLength) === "[object Array]") {
-                    parsed.fontTextRunLength = [String(text).length];
+    for (var idxPos = 0; idxPos < indices.length; idxPos++) {
+        var param = comp.properties[indices[idxPos]];
+        var appliedJson = false;
+
+        try {
+            var rawVal = String(param.getValue());
+            var parsed = JSON.parse(rawVal);
+
+            if (parsed && typeof parsed === "object") {
+                var runCount = 1;
+                if (Object.prototype.toString.call(parsed.fontTextRunLength) === "[object Array]" && parsed.fontTextRunLength.length > 0) {
+                    runCount = parsed.fontTextRunLength.length;
+                } else if (Object.prototype.toString.call(parsed.fontEditValue) === "[object Array]" && parsed.fontEditValue.length > 0) {
+                    runCount = parsed.fontEditValue.length;
+                } else if (typeof parsed.capPropTextRunCount === "number" && parsed.capPropTextRunCount > 0) {
+                    runCount = parsed.capPropTextRunCount;
+                }
+
+                if (text !== null) {
+                    var strText = String(text);
+                    parsed.textEditValue = strText;
+                    runCount = 1;
+                    if (typeof parsed.capPropTextRunCount === "number") {
+                        parsed.capPropTextRunCount = 1;
+                    }
+                    if (Object.prototype.toString.call(parsed.fontTextRunLength) === "[object Array]") {
+                        parsed.fontTextRunLength = [strText.length];
+                    }
+                    /* Keep all per-run style arrays synchronized to length 1 when replacing full text */
+                    var runArrKeys = ["fontFSAllCapsValue", "fontFSBoldValue", "fontFSItalicValue", "fontFSSmallCapsValue"];
+                    for (var rk = 0; rk < runArrKeys.length; rk++) {
+                        var kName = runArrKeys[rk];
+                        if (Object.prototype.toString.call(parsed[kName]) === "[object Array]" && parsed[kName].length > 1) {
+                            parsed[kName] = [parsed[kName][0]];
+                        }
+                    }
+                }
+
+                if (wantsFont) {
+                    var fontPs = String(ov.font).replace(/^\s+|\s+$/g, "");
+                    var fontIsArray =
+                        Object.prototype.toString.call(parsed.fontEditValue) === "[object Array]";
+                    parsed.fontEditValue = fontIsArray
+                        ? cadrFillRunArray(parsed.fontEditValue, fontPs, runCount)
+                        : fontPs;
+                    if (parsed.fontObjectName !== undefined) {
+                        var foIsArray = Object.prototype.toString.call(parsed.fontObjectName) === "[object Array]";
+                        parsed.fontObjectName = foIsArray
+                            ? cadrFillRunArray(parsed.fontObjectName, fontPs, runCount)
+                            : fontPs;
+                    }
+                }
+
+                if (wantsSize) {
+                    var szNum = Number(ov.fontSize);
+                    if (parsed.fontSizeEditValue !== undefined) {
+                        var szIsArray =
+                            Object.prototype.toString.call(parsed.fontSizeEditValue) === "[object Array]";
+                        parsed.fontSizeEditValue = szIsArray
+                            ? cadrFillRunArray(parsed.fontSizeEditValue, szNum, runCount)
+                            : szNum;
+                    }
+                    if (ov.sizeKey && parsed[String(ov.sizeKey)] !== undefined) {
+                        var kIsArray =
+                            Object.prototype.toString.call(parsed[String(ov.sizeKey)]) === "[object Array]";
+                        parsed[String(ov.sizeKey)] = kIsArray
+                            ? cadrFillRunArray(parsed[String(ov.sizeKey)], szNum, runCount)
+                            : szNum;
+                    }
+                }
+
+                param.setValue(JSON.stringify(parsed), true);
+                appliedJson = true;
+
+                if (idxPos === 0) {
+                    if (text === null) {
+                        primaryMode = "json";
+                    } else {
+                        try {
+                            var back = JSON.parse(String(param.getValue()));
+                            if (back && back.textEditValue === String(text)) {
+                                primaryMode = "json";
+                            }
+                        } catch (eb) {
+                            primaryMode = "json";
+                        }
+                    }
                 }
             }
+        } catch (e1) {}
 
-            if (wantsFont) {
-                var fontIsArray =
-                    Object.prototype.toString.call(parsed.fontEditValue) === "[object Array]";
-                parsed.fontEditValue = fontIsArray ? [String(ov.font)] : String(ov.font);
-            }
-
-            if (wantsSize) {
-                var szNum = Number(ov.fontSize);
-                if (parsed.fontSizeEditValue !== undefined) {
-                    var szIsArray =
-                        Object.prototype.toString.call(parsed.fontSizeEditValue) === "[object Array]";
-                    parsed.fontSizeEditValue = szIsArray ? [szNum] : szNum;
-                }
-                if (ov.sizeKey && parsed[String(ov.sizeKey)] !== undefined) {
-                    var kIsArray =
-                        Object.prototype.toString.call(parsed[String(ov.sizeKey)]) === "[object Array]";
-                    parsed[String(ov.sizeKey)] = kIsArray ? [szNum] : szNum;
-                }
-            }
-
-            param.setValue(JSON.stringify(parsed), true);
-
-            if (text === null) {
-                return "json";
-            }
-
-            var back = JSON.parse(String(param.getValue()));
-            if (back && back.textEditValue === text) {
-                return "json";
+        if (!appliedJson && text !== null && idxPos === 0) {
+            try {
+                param.setValue(String(text), true);
+                primaryMode = "plain";
+            } catch (e2) {
+                return "SET_FAILED:" + e2.toString();
             }
         }
-    } catch (e1) {}
-
-    if (text === null) {
-        return "json";
     }
 
-    try {
-        param.setValue(String(text), true);
-        return "plain";
-    } catch (e2) {
-        return "SET_FAILED:" + e2.toString();
-    }
+    return primaryMode || "json";
 }
 
 function cadrFindMgtParamByName(comp, name) {
